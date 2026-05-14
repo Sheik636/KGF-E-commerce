@@ -1,0 +1,63 @@
+[{
+  "_id": {
+    "$oid": "69d34ca14c06e6ead7dbd192"
+  },
+  "name": "Formal Shirt",
+  "brand": "Zara",
+  "price": 1499,
+  "sizes": [
+    "M",
+    "L"
+  ],
+  "colours": [],
+  "stock": 5,
+  "createdAt": {
+    "$date": "2026-04-06T06:03:13.528Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-06T06:03:13.528Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69d5feffeeb83f2f593fcf9a"
+  },
+  "name": "Casual Shirt",
+  "brand": "Zara",
+  "price": 1299,
+  "sizes": [
+    "M",
+    "L"
+  ],
+  "colours": [],
+  "stock": 10,
+  "createdAt": {
+    "$date": "2026-04-08T07:08:47.013Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-08T07:08:47.013Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69d6192e9ba7c8cc54e09486"
+  },
+  "name": "T-Shirt",
+  "brand": "US POLO",
+  "price": 1099,
+  "sizes": [
+    "M",
+    "L"
+  ],
+  "colours": [],
+  "stock": 10,
+  "createdAt": {
+    "$date": "2026-04-08T09:00:30.434Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-08T09:00:30.434Z"
+  },
+  "__v": 0
+}]
