@@ -6,7 +6,7 @@ const upload = require("../middleware/uploadMiddleware");
 router.post("/upload", upload.single("image"),(req, res)=>{
     console.log(req.file)
     res.json({
-        image: req.file.path
+        images: req.file.path
     })
 })
 router.get('/', getProducts);

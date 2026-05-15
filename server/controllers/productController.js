@@ -52,7 +52,7 @@ const updateProduct = async (req,res)=>{
         productById.brand= req.body.brand || productById.brand;
         productById.catogery= req.body.catogery || productById.catogery;
         productById.stock= req.body.stock || productById.stock;
-        productById.image= req.body.image;
+        productById.images= req.body.images;
 
 
         const updatedProduct = await productById.save()
