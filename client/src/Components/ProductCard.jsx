@@ -65,7 +65,7 @@ const ProductCard = ({ product }) => {
 
       {/* Product Image */}
       <img
-        src={product.image}
+        src={product.images?.[0]}
         alt={product.name}
         className="w-full h-72x object-cover"
       />

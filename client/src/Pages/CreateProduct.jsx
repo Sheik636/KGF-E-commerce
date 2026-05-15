@@ -10,7 +10,7 @@ const CreateProduct = () => {
   const [brand, setBrand] = useState("");
   const [sizes, setSizes] = useState([]);
   const [stock, setStock] = useState(0);
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState([]);
 
   const navigate=useNavigate();
 
@@ -19,7 +19,7 @@ const CreateProduct = () => {
     try {
       
 
-    await API.post("/products", { name, price , brand, sizes, stock, image},
+    await API.post("/products", { name, price , brand, sizes, stock, images},
       {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("Admintoken")}`,
@@ -42,33 +42,38 @@ const CreateProduct = () => {
 
       <input
         placeholder="Name"
-        className="border p-2 block mb-2 rounded-lg"
+        className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setName(e.target.value)}
       />
 
       <input
         placeholder="Price"
-        className="border p-2 block mb-2 rounded-lg"
+        className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setPrice(Number(e.target.value))}
       />
       <input
         placeholder="Brand"
-        className="border p-2 block mb-2 rounded-lg"
+        className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setBrand(e.target.value)}
       />
       <input
         placeholder="Sizes"
-        className="border p-2 block mb-2 rounded-lg"
+        className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setSizes(e.target.value.split(","))}
       />
       <input
         placeholder="Opening Stock"
-        className="border p-2 block mb-2 rounded-lg"
+        className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setStock(Number(e.target.value))}
       />
-      <ImageCropper setImage={setImage} />
+      <ImageCropper setImages={setImages} />
+      <div className="flex gap-3 flex-wrap mt-4">
+        {images.map((img, index)=>(
+          <img src={img} key={index} alt="image preview" className="h-24 object-cover rounded-lg border w-full" />
+        ))}
+      </div>
 
-      <button className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg" type="submit">
+      <button className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg mt-4 w-full" type="submit">
         Create
       </button>
     </form>

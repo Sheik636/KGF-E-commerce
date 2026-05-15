@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import API from "../Services/api";
 import getCroppedImg from "../utiles/cropImage";
 
-const ImageCropper = ({setImage}) => {
+const ImageCropper = ({setImages}) => {
 
     const [crop, setCrop] = useState({x:0, y:0});
     const [zoom, setZoom] = useState(1);
@@ -34,8 +34,11 @@ const handleCropUpload = async()=>{
         const {data}= await API.post("/products/upload", formData,{headers:{"Content-type":"multipart/form-data"},
         }
     )
-    setImage(data.image)
+    if(data.images){
+        setImages((prev)=>
+        [...prev, data.images])}
     alert("Image Uploaded Successfully");
+    setImageSrc(null);
     setLoading(false)
     } catch (error) {
         console.log(error.message);

@@ -12,7 +12,7 @@ const EditProduct = () => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
     const [brand, setBrand] = useState("");
-    const [image, setImage] = useState("");
+    const [images, setImages] = useState([]);
     
 
     
@@ -22,7 +22,7 @@ const EditProduct = () => {
             setName(data.name);
             setPrice(data.price);
             setBrand(data.brand);
-            setImage(data.image);
+            setImages(data.images);
         }
         fetchProducts();
     },[id])
@@ -30,7 +30,7 @@ const EditProduct = () => {
     const updateHandler = async(e)=>{
         e.preventDefault();
         try {
-           await API.put(`/products/${id}`, {name, price,brand, image}, 
+           await API.put(`/products/${id}`, {name, price,brand, images}, 
             {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("Admintoken")}`,
@@ -55,11 +55,11 @@ const EditProduct = () => {
             <input type="text" value={brand} onChange={(e)=> setBrand(e.target.value)}  className="border p-2 block mb-2 rounded-lg"/>
             <br />
             <img
-                src={image || null}
+                src={images || null}
                 alt="product"
                 className="w-40 h-40 object-cover rounded mb-2"
             />
-            <ImageCropper setImage={setImage} />
+            <ImageCropper setImages={setImages} />
             
             <button className="bg-blue-500 text-white px-3 py-1 rounded mt-4" type='submit'>Update</button>
         </form>
