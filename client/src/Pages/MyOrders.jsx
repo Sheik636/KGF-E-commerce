@@ -75,7 +75,7 @@ const MyOrders =()=>{
                 </div>
                 {order.orderItems.map((item)=>(
                     <div key={item._id} className="flex items-center gap-4 border-b py-3 ">
-                        <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded" />
+                        <img src={item.images} alt={item.name} className="w-20 h-20 object-cover rounded" />
                         <div>
                             <h3 className="font-semibold">{item.name}</h3>
                             <p>Qty:{item.quantity}</p>

@@ -51,7 +51,7 @@ const handleCropUpload = async()=>{
         <input type="file" onChange={onSelectFile} className='border p-2 rounded-lg mb-4 w-full' />
         {imageSrc &&(
             <div className='relative w-full h-96 bg-black rounded-lg overflow-hidden'>
-                <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(croppedArea, croppedAreaPixels)=>{
+                <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={9/16} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(croppedArea, croppedAreaPixels)=>{
                     setCroppedAreaPixels(croppedAreaPixels);
                 }}/>
             </div>

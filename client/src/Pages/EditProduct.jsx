@@ -22,7 +22,7 @@ const EditProduct = () => {
             setName(data.name);
             setPrice(data.price);
             setBrand(data.brand);
-            setImages(data.images);
+            setImages(data.images || []);
         }
         fetchProducts();
     },[id])

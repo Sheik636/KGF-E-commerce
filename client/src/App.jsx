@@ -11,6 +11,7 @@ import EditProduct from "./Pages/EditProduct";
 import Checkout from "./Pages/CheckOut";
 import MyOrders from "./Pages/MyOrders";
 import AdminOrders from "./Pages/AdminOrders";
+import ProductDetails from "./Pages/ProductDetails";
 
 
 function AppContent(){
@@ -29,6 +30,7 @@ function AppContent(){
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/create" element={<CreateProduct />}/>
         <Route path="/admin/edit/:id" element={< EditProduct/>}/>
+        <Route path="/admin/orders" element={<AdminOrders />}></Route>
 
         <Route path="/" element={<Home />}></Route>
         <Route path="/login" element={<Login />}></Route>
@@ -36,7 +38,8 @@ function AppContent(){
         <Route path="/cart" element={<Cart />}></Route>
         <Route path="/checkout" element={<Checkout />}></Route>
         <Route path="/myorders" element={<MyOrders />}></Route>
-        <Route path="/admin/orders" element={<AdminOrders />}></Route>
+        <Route path="/product/:id" element={<ProductDetails />}></Route>
+        
 
       </Routes>
     

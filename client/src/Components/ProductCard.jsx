@@ -2,6 +2,7 @@ import API from "../Services/api";
 import { useState, useEffect, useContext } from "react";
 import {toast} from "react-toastify";
 import { CartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   const [cartItem, setCartItem] = useState(null);
@@ -60,7 +61,7 @@ const ProductCard = ({ product }) => {
   }
 
   return (
-
+    <Link to={`/product/${product._id}`}>
     <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
 
       {/* Product Image */}
@@ -89,6 +90,7 @@ const ProductCard = ({ product }) => {
           
       </div>
     </div>
+    </Link>
   );
 };
 
