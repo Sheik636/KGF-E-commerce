@@ -27,6 +27,7 @@ const ProductCard = ({ product }) => {
   const addToCart = async () => {
 
     try {
+      
 
       await API.post("/cart", {
         productId: product._id,
