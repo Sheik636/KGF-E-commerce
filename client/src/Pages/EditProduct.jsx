@@ -54,11 +54,15 @@ const EditProduct = () => {
             <label className='text-sm'>Change Brand Name</label>
             <input type="text" value={brand} onChange={(e)=> setBrand(e.target.value)}  className="border p-2 block mb-2 rounded-lg"/>
             <br />
-            <img
-                src={images || null}
-                alt="product"
-                className="w-40 h-40 object-cover rounded mb-2"
-            />
+            <div className='flex gap-3 flex-wrap my-4'>
+                {images.map((img,index)=>(
+                    <div key={index} className='relative'>
+                        <img src={img} alt="Preview" className='w-24 h-24 object-cover rounded-lg border'/>
+                        <button type='button' onClick={()=>setImages(images.filter((_,i)=>i!==index))} className='absolute top-0 right-0 text-red-500 rounded-full w-6 h-6'>✕</button>
+                    </div>
+                    
+                ))}
+            </div>
             <ImageCropper setImages={setImages} />
             
             <button className="bg-blue-500 text-white px-3 py-1 rounded mt-4" type='submit'>Update</button>

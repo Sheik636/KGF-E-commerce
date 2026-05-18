@@ -10,6 +10,7 @@ const ImageCropper = ({setImages}) => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [imageSrc, setImageSrc] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [ratio, setRatio]= useState(9/16)
     
 
     const onSelectFile = (e) => {
@@ -50,11 +51,35 @@ const handleCropUpload = async()=>{
     <div className='w-full'>
         <input type="file" onChange={onSelectFile} className='border p-2 rounded-lg mb-4 w-full' />
         {imageSrc &&(
-            <div className='relative w-full h-96 bg-black rounded-lg overflow-hidden'>
-                <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={9/16} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(croppedArea, croppedAreaPixels)=>{
+            <>
+                <div className='mb-4'>
+                    <label className='block font-semibold mb-2'>
+                        Crop Ratio:
+                    </label>
+                    <select value={ratio} onChange={(e)=>setRatio(Number(e.target.value))} className='border p-2 rounded-lg w-full'>
+                            <option value={1}>
+                                1:1 Sqare
+                            </option>
+                            <option value={9/16}>
+                                9:16 Portrait
+                            </option>
+                            <option value={16/9}>
+                                16:9 Landscape
+                            </option>
+                            <option value={4/5}>
+                                4:5 Instagram
+                            </option>
+                            <option value={3/4}>
+                                3:4 Product
+                            </option>
+                        </select>
+                </div>
+                <div className='relative w-full h-96 bg-black rounded-lg overflow-hidden'>
+                <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={ratio} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(croppedArea, croppedAreaPixels)=>{
                     setCroppedAreaPixels(croppedAreaPixels);
                 }}/>
             </div>
+            </>
         )}
         {imageSrc && (
             <div className='mt-4'>

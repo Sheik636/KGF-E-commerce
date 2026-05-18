@@ -66,12 +66,17 @@ const CreateProduct = () => {
         className="border p-2 block mb-2 rounded-lg w-full"
         onChange={(e) => setStock(Number(e.target.value))}
       />
-      <ImageCropper setImages={setImages} />
-      <div className="flex gap-3 flex-wrap mt-4">
-        {images.map((img, index)=>(
-          <img src={img} key={index} alt="image preview" className="h-24 object-cover rounded-lg border w-full" />
-        ))}
+      <div className="flex gap-3 flex-wrap my-4">
+        {images.map((img,index)=>(
+                    <div key={index} className='relative'>
+                        <img src={img} alt="Preview" className='w-24 h-24 object-cover rounded-lg border'/>
+                        <button type='button' onClick={()=>setImages(images.filter((_,i)=>i!==index))} className='absolute top-0 right-0 text-red-500 rounded-full w-6 h-6'>✕</button>
+                    </div>
+                    
+                ))}
       </div>
+      <ImageCropper setImages={setImages} />
+      
 
       <button className="bg-green-500 text-white font-bold px-4 py-2 rounded-lg mt-4 w-full" type="submit">
         Create

@@ -19,7 +19,7 @@ const Home = ()=>{
             }
         }
         fetchProducts();
-    },[brand,sort]);
+    },[keyword, brand,sort]);
     return(
         <>
         <SearchSideBar isOpen={isOpen} setIsOpen={setIsOpen} keyword={keyword} setKeyword={setKeyword} brand={brand} setBrand={setBrand} sort={sort} setSort={setSort}/>
