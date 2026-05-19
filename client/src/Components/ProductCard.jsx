@@ -1,97 +1,71 @@
 import API from "../Services/api";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {toast} from "react-toastify";
-import { CartContext } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../Redux/cartSlice";
+import SizeSelectorModal from "./SizeSelectorModel";
 
 const ProductCard = ({ product }) => {
-  const [cartItem, setCartItem] = useState(null);
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [showSelector, setShowSelector] = useState(false);
+  const [showSizePopup, setShowSizePopup] = useState(false);
+  const [chooseSize, setChooseSize] = useState("");
 
-  const {cartCount, setCartCount}= useContext(CartContext);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  useEffect(()=>{
-    const fetchCart = async()=>{
-        try {
-          const {data}= await API.get("/cart",{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}})
-          const item =data.find((item)=>item.product._id === product._id)
-          setCartItem(item)
-        } catch (error) {
-          console.log(error.message)
-        }
+  const handleAddToCart=()=>{
+    const token = localStorage.getItem("token");
+    if(!token){
+      toast.warning("Login Required..!")
+      navigate("/login");
+      return;
     }
-    fetchCart()
-  },[product._id])
-
-  const addToCart = async () => {
-
-    try {
-      
-
-      await API.post("/cart", {
-        productId: product._id,
-        quantity: selectedQuantity,
-      });
-
-      setCartItem({product,quantity: selectedQuantity,});
-
-      setCartCount(cartCount+selectedQuantity)
-      toast.success("Added to cart");
-
-
-    } catch (error) {
-
-      toast.warning("Login required");
-
+    if(!chooseSize){
+      toast.warning("Please Select a Size");
+      return;
     }
-  };
-
-  const updateQuantity = async(action)=>{
-      try {
-        const {data}= await API.put("/cart/update",{productId: product._id, action},{headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}})
-        
-        const updateItem = data.find((item)=>item.product.toString() === product._id);
-        if(action == "increase"){setCartCount(cartCount+1)}
-        if(action == "decrease"){setCartCount(Math.max(0,cartCount-1))}
-        
-        setCartItem(updateItem || null)
-      } catch (error) {
-        console.log(error.message)
-      }
+    dispatch(
+      addToCart({
+        ...product,
+        chooseSize:chooseSize,
+        quantity:1
+      })
+    )
+    toast.success("Added to Cart");
+    setShowSizePopup(false);
+    setChooseSize("")
   }
 
   return (
+    <div className="bg-gray-300 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-transform duration-300 will-change-transform">
     <Link to={`/product/${product._id}`}>
-    <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
 
       {/* Product Image */}
       <img
         src={product.images?.[0]}
         alt={product.name}
-        className="w-full h-72x object-cover"
+        className="w-full h-72 p-2 rounded-xl object-cover"
       />
 
       {/* Product Details */}
-      <div className="p-5 space-y-3">
-        <h2 className="text-red-600 text-lg font-semibold">
+      
+        <h2 className="text-red-600 text-center text-lg font-semibold">
           {product.name}
         </h2>
 
-        <p className="text-green-600 font-bold mt-2">
+        <p className="text-green-600 text-center font-bold mt-2">
           ₹ {product.price}
         </p>
-        {cartItem ?(<div className="flex items-center gap-4 m-5"><button onClick={()=>updateQuantity("decrease")} className="bg-red-500 text-white px-3 py-1 rounded">-</button><span className="font-bold">{cartItem.quantity}</span><button onClick={()=>updateQuantity("increase")} className="bg-green-500 text-white px-3 py-1 rounded">+</button> </div>):(!showSelector? <button onClick={()=>setShowSelector(true)} className="bg-blue-500 rounded-lg text-white mt-4 px-4 py-2 w-full">
-        Cart
-        </button> :<> <div className="flex items-center gap-4 m-5">
-          <button onClick={()=> setSelectedQuantity(Math.max(1,selectedQuantity-1))}className="bg-red-500 text-white px-3 py-1 rounded">-</button> <span className="font-bold text-lg">{selectedQuantity}</span><button onClick={()=> setSelectedQuantity(selectedQuantity+1)} className="bg-green-500 text-white px-3 py-1 rounded">+</button> 
-        </div><button onClick={addToCart} className="bg-blue-500 rounded-lg text-white mt-4 px-4 py-2 w-full">
-          Add to Cart
-        </button></>)}
+        </Link>
+        <div className="p-5 space-y-3">
+        <button onClick={(e)=>{
+            e.preventDefault()
+            setShowSizePopup(true)
+          }} className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full mt-4">Cart</button>
+       <SizeSelectorModal show={showSizePopup} onClose={()=> setShowSizePopup(false)} sizes={product?.sizes} chooseSize={chooseSize} setChooseSize={setChooseSize} onConfirm={handleAddToCart}/>
           
       </div>
     </div>
-    </Link>
   );
 };
 
