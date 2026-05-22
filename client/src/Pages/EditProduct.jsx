@@ -5,7 +5,7 @@ import {useNavigate} from 'react-router-dom';
 import ImageCropper from '../Components/ImageCropper';
 
 const EditProduct = () => {
-    const {id}= useParams();
+    const {id}= useParams()
 
     const navigate = useNavigate()
     
