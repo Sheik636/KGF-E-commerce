@@ -8,7 +8,7 @@ const { adminProtect }= require("../middleware/adminMiddleware");
 
 router.post("/", protect, createOrder);
 router.get("/myorders", protect, getMyOrders);
-router.get("/all", protect, adminProtect, getAllOrders);
+router.get("/all", adminProtect, getAllOrders);
 router.put("/:id/deliver", adminProtect, markDelivered);
 router.post("/:id/pay",protect, createPaymentOrder);
 router.post("/payment-verify", protect, verifyPayment)

@@ -9,14 +9,14 @@ const OrderSummary = ({cartItems, buttonText= "Proceed to Checkout", buttonActio
       const tax= Math.round(subtotal*0.05);
       const total= subtotal+shipping+tax;
 
-      const handleButtonClick=()=>{
+      const handleButtonClick= async()=>{
         dispatch(setOrderSummary({
             subtotal,
             shipping,
             tax,
             total
         }))
-        buttonAction()
+        await buttonAction()
       }
   return (
     <div className="mt-8 border rounded-xl p-6 shadow-md bg-red-200 max-w-6xl ml-auto">

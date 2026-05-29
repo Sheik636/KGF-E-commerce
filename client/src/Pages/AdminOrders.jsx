@@ -10,6 +10,7 @@ const AdminOrders = () => {
         const fetchOrders =async()=>{
             try {
                 setLoading(true)
+                console.log("Admin Token:", localStorage.getItem("Admintoken"));
                 const {data}= await API.get("/orders/all", {
                     headers:{
                         Authorization: `Bearer ${localStorage.getItem("Admintoken")}`

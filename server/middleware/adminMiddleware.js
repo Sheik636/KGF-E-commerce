@@ -3,7 +3,8 @@ const Admin = require("../models/adminModel");
 
 const adminProtect =
 async (req, res, next) => {
-
+  console.log("ADMIN PROTECT HIT");
+  console.log(req.headers.authorization);
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
@@ -14,7 +15,17 @@ async (req, res, next) => {
 
       const decoded =jwt.verify(token, process.env.JWT_SECRET);
 
+      console.log("Decoded:", decoded);
+
       req.admin =await Admin.findById(decoded.id).select("-password");
+
+      console.log("Admin Found:", req.admin);
+
+      if (!req.admin) {
+        return res.status(401).json({
+          message: "Admin not found",
+        });
+      }
 
       next();
 

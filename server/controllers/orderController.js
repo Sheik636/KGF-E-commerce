@@ -5,58 +5,74 @@ const razorpay = require("../config/razorpay");
 const crypto = require("crypto");
 
 
-const createOrder = async(req,res)=>{
-    try {
-        const user = await User.findById(req.user._id).populate("cart.product");
-        if(!user.cart.length){
-           return res.status(404).json({message: "The Cart is Empty"})
-        }
-        const {
-            name,
-          address,
-          city,
-          postalCode,
-          country
-        } = req.body.shippingAddress;
+const createOrder = async (req, res) => {
+  try {
 
-        if ( !name ||!address || !city || !postalCode || !country) {
-          return res.status(400).json({
-            message:
-            "Shipping details required",
-          });
-        }
-        const order = new Order({
-            user: user._id,
-            orderItems: user.cart.map((item) => ({
-                product: item.product._id,
-                name: item.product.name,
-                image: item.product.image,
-                price: item.product.price,
-                quantity: item.quantity,
-            })),
-            shippingAddress: {
-                name,
-                address,
-                city,
-                postalCode,
-                country
-            },
-            totalPrice: user.cart.reduce((acc, item)=> acc + item.quantity * item.product.price, 0),
-        })
-        console.log(order)
-        const savedOrder = await order.save();
+    const {
+      orderItems,
+      shippingAddress,
+      total,
+    } = req.body;
 
-        user.cart=[];
-        await user.save();
-
-        res.status(201).json(savedOrder);
-
-        
-
-    } catch (error) {
-        res.status(500).json({error: error.message})
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(400).json({
+        message: "No order items",
+      });
     }
-} 
+
+    const {
+      name,
+      address,
+      city,
+      postalCode,
+      country,
+    } = shippingAddress;
+
+    if (
+      !name ||
+      !address ||
+      !city ||
+      !postalCode ||
+      !country
+    ) {
+      return res.status(400).json({
+        message: "Shipping details required",
+      });
+    }
+
+    const order = new Order({
+      user: req.user._id,
+
+      orderItems: orderItems.map((item) => ({
+        product: item.product,
+        name: item.name,
+        images: item.images,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,
+      })),
+
+      shippingAddress: {
+        name,
+        address,
+        city,
+        postalCode,
+        country,
+      },
+
+      totalPrice: total,
+    });
+
+    const savedOrder = await order.save();
+
+    res.status(201).json(savedOrder);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+}; 
 
 const getMyOrders = async (req,res)=>{
     const orders = await Order.find({user: req.user._id}).populate({path:"orderItems.product", strictPopulate: false});

@@ -12,6 +12,7 @@ const MyOrders =()=>{
                 setLoading(true);
                 const {data}= await API.get("/orders/myorders", {headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
                 setOrders(data);
+                console.log(data);
             } catch (error) {
                 console.log(error.message)
             }finally{
@@ -19,6 +20,7 @@ const MyOrders =()=>{
             }
         }
         fetchOrders()
+        
     },[]);
 
     const payment= async (order)=>{
@@ -75,7 +77,7 @@ const MyOrders =()=>{
                 </div>
                 {order.orderItems.map((item)=>(
                     <div key={item._id} className="flex items-center gap-4 border-b py-3 ">
-                        <img src={item.images} alt={item.name} className="w-20 h-20 object-cover rounded" />
+                        <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded" />
                         <div>
                             <h3 className="font-semibold">{item.name}</h3>
                             <p>Qty:{item.quantity}</p>

@@ -50,7 +50,6 @@ const Checkout = ()=>{
       navigate("/myorders")
     } catch (error) {
       toast.error("Error Placing Order");
-      console.log(error.message)
     }finally{
         setLoading(false)
     }

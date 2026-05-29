@@ -27,7 +27,7 @@ const cartSlice = createSlice({
         },
         clearCart:(state)=>{
             state.cartItems=[];
-            localStorage.removeItemItem("cartItems")
+            localStorage.removeItem("cartItems")
         },
         increaseQuantity:(state,action)=>{
             const item = state.cartItems.find((_,index)=>index===action.payload);
