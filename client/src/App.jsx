@@ -1,5 +1,6 @@
-import {BrowserRouter, Route, Routes, useLocation} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./Components/Navbar";
+import AdminProtectedRoute from "./Components/AdminProtectedRoute";
 import Home from "./Pages/Home";
 import AdminLogin from "./Pages/AdminLogin";
 import Login from "./Pages/Login";
@@ -11,48 +12,80 @@ import EditProduct from "./Pages/EditProduct";
 import Checkout from "./Pages/CheckOut";
 import MyOrders from "./Pages/MyOrders";
 import AdminOrders from "./Pages/AdminOrders";
+import AdminUsers from "./Pages/AdminUsers";
 import ProductDetails from "./Pages/ProductDetails";
 
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAdminLogin = location.pathname === "/admin/login";
 
-function AppContent(){
-   const location = useLocation()
-
-   const hideNav = location.pathname.startsWith("/admin");
   return (
-    <>
-     {!hideNav && <Navbar />}
-    
-    
-     
-      <Routes>
+    <div className="min-h-screen bg-brand-black">
+      {!isAdminRoute && <Navbar />}
+      <main key={location.pathname} className={isAdminLogin ? "" : "animate-fade-in"}>
+        <Routes>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/create"
+            element={
+              <AdminProtectedRoute>
+                <CreateProduct />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/edit/:id"
+            element={
+              <AdminProtectedRoute>
+                <EditProduct />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminProtectedRoute>
+                <AdminOrders />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminProtectedRoute>
+                <AdminUsers />
+              </AdminProtectedRoute>
+            }
+          />
 
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/create" element={<CreateProduct />}/>
-        <Route path="/admin/edit/:id" element={< EditProduct/>}/>
-        <Route path="/admin/orders" element={<AdminOrders />}></Route>
-
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="/register" element={<Register />}></Route>
-        <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/checkout" element={<Checkout />}></Route>
-        <Route path="/myorders" element={<MyOrders />}></Route>
-        <Route path="/product/:id" element={<ProductDetails />}></Route>
-        
-
-      </Routes>
-    
-    </>
-  )
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/myorders" element={<MyOrders />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
-function App(){
-  return(
+function App() {
+  return (
     <BrowserRouter>
-    <AppContent/>
+      <AppContent />
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

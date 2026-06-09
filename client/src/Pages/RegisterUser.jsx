@@ -1,5 +1,6 @@
 import { useState } from "react";
-import API from "../services/api";
+import API from "../Services/api";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -8,20 +9,11 @@ const Register = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
-      const { data } = await API.post("/users/register", {
-        name,
-        email,
-        password,
-      });
-
-      // 🔐 save login info
+      const { data } = await API.post("/users/register", { name, email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("userInfo", JSON.stringify(data));
-
       alert("Registration Successful");
-
       window.location.href = "/";
     } catch (error) {
       alert("Registration Failed");
@@ -29,43 +21,61 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={submitHandler}
-        className="bg-white p-8 rounded-lg shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Create Account
-        </h2>
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.12),transparent_70%)]" />
 
-        <input
-          type="text"
-          placeholder="Enter Name"
-          className="border p-2 w-full mb-4 rounded"
-          onChange={(e) => setName(e.target.value)}
-        />
+      <div className="relative w-full max-w-md animate-scale-in">
+        <div className="card-dark p-8 shadow-[0_0_60px_rgba(229,9,20,0.1)]">
+          <div className="text-center mb-8">
+            <h1 className="font-display text-5xl text-brand-red mb-2">KGF</h1>
+            <h2 className="text-xl font-semibold text-white">Join the Movement</h2>
+            <p className="text-brand-muted text-sm mt-1">Create your account today</p>
+          </div>
 
-        <input
-          type="email"
-          placeholder="Enter Email"
-          className="border p-2 w-full mb-4 rounded"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <form onSubmit={submitHandler} className="space-y-4">
+            <div>
+              <label className="block text-sm text-brand-muted mb-1.5">Full Name</label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                className="input-dark"
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-brand-muted mb-1.5">Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="input-dark"
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-brand-muted mb-1.5">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="input-dark"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="btn-primary w-full py-3 mt-2">
+              Create Account
+            </button>
+          </form>
 
-        <input
-          type="password"
-          placeholder="Enter Password"
-          className="border p-2 w-full mb-4 rounded"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600"
-        >
-          Register
-        </button>
-      </form>
+          <p className="text-center text-brand-muted text-sm mt-6">
+            Already have an account?{" "}
+            <Link to="/login" className="text-brand-red hover:underline font-medium">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

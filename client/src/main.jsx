@@ -18,7 +18,12 @@ root.render(
     </SearchProvider>
     
     
-    <ToastContainer position="top-right" autoClose={2000} theme="dark"/>
+    <ToastContainer
+      position="top-right"
+      autoClose={2000}
+      theme="dark"
+      toastStyle={{ background: "#1c1c1c", border: "1px solid #2a2a2a" }}
+    />
     </Provider>
 );
 

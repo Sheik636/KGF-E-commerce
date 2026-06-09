@@ -1,45 +1,78 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import API from "../Services/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-    const navigate = useNavigate()
-
-    const submitHandler = async (e)=>{
-        e.preventDefault();
-        try {
-            const {data} = await API.post("/users/login", {
-                email,
-                password
-            });
-            localStorage.setItem("token", data.token);
-            alert("Login Successfully")
-            console.log(data);
-        } catch (error) {
-            console.log(error.message);
-            alert("Invalid Credentials");
-        }
-
-        navigate("/")
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await API.post("/users/login", { email, password });
+      localStorage.setItem("token", data.token);
+      alert("Login Successfully");
+      navigate("/");
+    } catch (error) {
+      console.log(error.message);
+      alert("Invalid Credentials");
     }
-    
-    return(
-        <>
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <form onSubmit={submitHandler} className="bg-white p-8 rounded-lg shadow-md w-96">
-                <h2 className="text-2xl font-bold mb-6 text-center">Log in</h2>
-                <input type="text" value={email} onChange={(e)=> setEmail(e.target.value)} placeholder="Enter your Email" className="border p-2 w-full mb-4 rounded"/>
-                <br /><br />
-                <input type="password" value={password} placeholder="Password" onChange={(e)=> setPassword(e.target.value)} className="border p-2 w-full mb-4 rounded" />
-                <br /><br />
-                <button type="submit" className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">Login</button>
-            </form>
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.12),transparent_70%)]" />
+
+      <div className="relative w-full max-w-md animate-scale-in">
+        <div className="card-dark p-8 shadow-[0_0_60px_rgba(229,9,20,0.1)]">
+          <div className="text-center mb-8">
+            <h1 className="font-display text-5xl text-brand-red mb-2">KGF</h1>
+            <h2 className="text-xl font-semibold text-white">Welcome Back</h2>
+            <p className="text-brand-muted text-sm mt-1">Sign in to your account</p>
+          </div>
+
+          <form onSubmit={submitHandler} className="space-y-4">
+            <div className="animate-fade-in-up delay-100">
+              <label className="block text-sm text-brand-muted mb-1.5">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="input-dark"
+                required
+              />
+            </div>
+            <div className="animate-fade-in-up delay-200">
+              <label className="block text-sm text-brand-muted mb-1.5">Password</label>
+              <input
+                type="password"
+                value={password}
+                placeholder="••••••••"
+                onChange={(e) => setPassword(e.target.value)}
+                className="input-dark"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn-primary w-full py-3 mt-2 animate-fade-in-up delay-300"
+            >
+              Sign In
+            </button>
+          </form>
+
+          <p className="text-center text-brand-muted text-sm mt-6">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-brand-red hover:underline font-medium">
+              Create one
+            </Link>
+          </p>
         </div>
-        </>
-    )
+      </div>
+    </div>
+  );
 }
 
 export default Login;

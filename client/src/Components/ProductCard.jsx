@@ -1,6 +1,5 @@
-import API from "../Services/api";
-import { useState, useEffect } from "react";
-import {toast} from "react-toastify";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../Redux/cartSlice";
@@ -9,61 +8,85 @@ import SizeSelectorModal from "./SizeSelectorModel";
 const ProductCard = ({ product }) => {
   const [showSizePopup, setShowSizePopup] = useState(false);
   const [chooseSize, setChooseSize] = useState("");
+  const [imgLoaded, setImgLoaded] = useState(false);
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleAddToCart=()=>{
+  const handleAddToCart = () => {
     const token = localStorage.getItem("token");
-    if(!token){
-      toast.warning("Login Required..!")
+    if (!token) {
+      toast.warning("Login Required..!");
       navigate("/login");
       return;
     }
-    if(!chooseSize){
+    if (!chooseSize) {
       toast.warning("Please Select a Size");
       return;
     }
     dispatch(
       addToCart({
         ...product,
-        chooseSize:chooseSize,
-        quantity:1
+        chooseSize: chooseSize,
+        quantity: 1,
       })
-    )
+    );
     toast.success("Added to Cart");
     setShowSizePopup(false);
-    setChooseSize("")
-  }
+    setChooseSize("");
+  };
 
   return (
-    <div className="bg-gray-300 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-transform duration-300 will-change-transform">
-    <Link to={`/product/${product._id}`}>
+    <div className="card-dark overflow-hidden group">
+      <Link to={`/product/${product._id}`} className="block relative">
+        <div className="relative overflow-hidden bg-brand-dark">
+          {!imgLoaded && (
+            <div className="absolute inset-0 animate-shimmer bg-brand-border/30" />
+          )}
+          <img
+            src={product.images?.[0]}
+            alt={product.name}
+            onLoad={() => setImgLoaded(true)}
+            className={`w-full h-72 object-cover transition-all duration-500 group-hover:scale-110 ${
+              imgLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <span className="text-white text-sm font-medium tracking-wide">
+              View Details →
+            </span>
+          </div>
+        </div>
 
-      {/* Product Image */}
-      <img
-        src={product.images?.[0]}
-        alt={product.name}
-        className="w-full h-72 p-2 rounded-xl object-cover"
-      />
+        <div className="p-5">
+          <h2 className="text-white text-lg font-semibold truncate group-hover:text-brand-red transition-colors duration-300">
+            {product.name}
+          </h2>
+          <p className="text-brand-red font-bold text-xl mt-1">
+            ₹ {product.price}
+          </p>
+        </div>
+      </Link>
 
-      {/* Product Details */}
-      
-        <h2 className="text-red-600 text-center text-lg font-semibold">
-          {product.name}
-        </h2>
-
-        <p className="text-green-600 text-center font-bold mt-2">
-          ₹ {product.price}
-        </p>
-        </Link>
-        <div className="p-5 space-y-3">
-        <button onClick={(e)=>{
-            e.preventDefault()
-            setShowSizePopup(true)
-          }} className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full mt-4">Cart</button>
-       <SizeSelectorModal show={showSizePopup} onClose={()=> setShowSizePopup(false)} sizes={product?.sizes} chooseSize={chooseSize} setChooseSize={setChooseSize} onConfirm={handleAddToCart}/>
-          
+      <div className="px-5 pb-5">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setShowSizePopup(true);
+          }}
+          className="btn-primary w-full py-2.5 text-sm"
+        >
+          Add to Cart
+        </button>
+        <SizeSelectorModal
+          show={showSizePopup}
+          onClose={() => setShowSizePopup(false)}
+          sizes={product?.sizes}
+          chooseSize={chooseSize}
+          setChooseSize={setChooseSize}
+          onConfirm={handleAddToCart}
+        />
       </div>
     </div>
   );

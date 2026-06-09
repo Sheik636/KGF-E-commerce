@@ -1,59 +1,61 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
+const { validationResult } = require("express-validator");
 
-const registerUser = async (req, res)=>{
-    try {
-        const {name, email, password} = new User(req.body);
-
-        const userExists = await User.findOne({email});
-        if(userExists){
-            return res.status(400).json({message: "User already exists"});
-
-        }
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const createUser =await User.create({
-            name,
-            email,
-            password: hashedPassword
-        })
-
-        res.status(201).json({
-            _id: createUser._id,
-            name: createUser.name,
-            email: createUser.email,
-            token: generateToken(createUser._id)
-        })
-    } catch (error) {
-        res.status(500).json({message: error.message})
-
+const registerUser = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
-}
 
-const loginUser = async (req,res)=>{
-    try {
-        const {email,password}= req.body;
-        
-        const user = await User.findOne({email});
+    const { name, email, password } = req.body;
 
-        if(user && (await bcrypt.compare(password, user.password))){
-            res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                token: generateToken(user._id)
-            });
-
-        }else{
-            res.status(401).json({message: "Invalid email or password"});
-        }
-
-    } catch (error) {
-        res.status(500).json({message: error.message})        
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "User already exists" });
     }
-}
 
-module.exports = {registerUser, loginUser};
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const createUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({
+      _id: createUser._id,
+      name: createUser.name,
+      email: createUser.email,
+      token: generateToken(createUser._id),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: "Invalid email or password" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser };
