@@ -3,7 +3,10 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../Redux/cartSlice";
+import { addToWishlist, removeFromWishlist } from "../Redux/wishlistslice";
+import { useSelector } from "react-redux";
 import SizeSelectorModal from "./SizeSelectorModel";
+import { Heart } from "lucide-react"
 
 const ProductCard = ({ product }) => {
   const [showSizePopup, setShowSizePopup] = useState(false);
@@ -35,11 +38,38 @@ const ProductCard = ({ product }) => {
     setShowSizePopup(false);
     setChooseSize("");
   };
+  const wishlistItems = useSelector(
+  state => state.wishlist.wishlistItems
+);
+
+const isWishlisted = wishlistItems.some(
+  item => item._id === product._id
+);
+  const handleWishlist= (e)=>{
+    e.preventDefault();
+
+    if(isWishlisted){
+      dispatch(removeFromWishlist(product._id))
+          toast.info("Removed from Wishlist");
+    }else{
+      dispatch(addToWishlist(product))
+      toast.info("Added from Wishlist");
+
+    }
+  }
 
   return (
     <div className="card-dark overflow-hidden group">
       <Link to={`/product/${product._id}`} className="block relative">
         <div className="relative overflow-hidden bg-brand-dark">
+          <Heart
+            size={22}
+            className={`transition-all duration-300 ${
+              isWishlisted
+                ? "fill-brand-red text-brand-red"
+                : "text-white"
+            }`}
+          />
           {!imgLoaded && (
             <div className="absolute inset-0 animate-shimmer bg-brand-border/30" />
           )}
