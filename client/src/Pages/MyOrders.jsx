@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import API from "../Services/api";
+import FireLoader from "../Components/FireLoader";
 import { Link } from "react-router-dom";
 
 const MyOrders = () => {
@@ -14,8 +16,8 @@ const MyOrders = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         setOrders(data);
-      } catch (error) {
-        console.log(error.message);
+      } catch {
+        toast.error("Failed to load orders");;
       } finally {
         setLoading(false);
       }
@@ -48,7 +50,7 @@ const MyOrders = () => {
             },
             { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
           );
-          alert("Payment successfull..!");
+                    toast.success("Payment successful!");
           setOrders(
             orders.map((ord) =>
               ord._id === order._id ? { ...ord, isPaid: true } : ord
@@ -60,8 +62,8 @@ const MyOrders = () => {
 
       const razor = new window.Razorpay(options);
       razor.open();
-    } catch (error) {
-      console.log(error.message);
+    } catch {
+      toast.error("Payment failed");;
     }
   };
 
@@ -73,9 +75,7 @@ const MyOrders = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
-        </div>
+        <FireLoader fullScreen size="lg" text="Loading orders..." />
       ) : orders.length === 0 ? (
         <div className="text-center py-24 animate-fade-in">
           <div className="text-6xl mb-4 animate-float">📦</div>

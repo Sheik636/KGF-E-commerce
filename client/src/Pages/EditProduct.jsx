@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../Services/api";
 import AdminLayout from "../Components/AdminLayout";
+import FireLoader from "../Components/FireLoader";
 import ImageCropper from "../Components/ImageCropper";
 
 const EditProduct = () => {
@@ -62,9 +63,7 @@ const EditProduct = () => {
   if (fetching) {
     return (
       <AdminLayout title="EDIT PRODUCT">
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
-        </div>
+        <FireLoader fullScreen size="lg" text="Loading product..." />
       </AdminLayout>
     );
   }

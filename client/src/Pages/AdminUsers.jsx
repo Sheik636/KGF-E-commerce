@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import API from "../Services/api";
 import AdminLayout from "../Components/AdminLayout";
+import FireLoader from "../Components/FireLoader";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -24,9 +25,7 @@ const AdminUsers = () => {
   return (
     <AdminLayout title="USERS" subtitle="Registered customer accounts">
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
-        </div>
+        <FireLoader fullScreen size="lg" text="Loading users..." />
       ) : users.length === 0 ? (
         <div className="text-center py-20 card-dark">
           <p className="font-display text-3xl text-brand-muted">NO USERS</p>

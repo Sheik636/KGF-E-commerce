@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../Services/api";
 import AdminLayout from "../Components/AdminLayout";
+import FireLoader, { FireSkeleton } from "../Components/FireLoader";
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
@@ -18,9 +19,8 @@ const AdminDashboard = () => {
       ]);
       setProducts(productsRes.data);
       setStats(statsRes.data);
-    } catch (error) {
+    } catch {
       toast.error("Failed to load dashboard");
-      console.log(error.message);
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
       {loading ? (
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="card-dark h-20 animate-shimmer" />
+            <FireSkeleton key={i} className="h-20" style={{ animationDelay: `${i * 0.1}s` }} />
           ))}
         </div>
       ) : products.length === 0 ? (

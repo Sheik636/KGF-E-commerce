@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Heart } from "lucide-react";
 import API from "../Services/api";
-import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../Redux/cartSlice";
+import { addToWishlist, removeFromWishlist } from "../Redux/wishlistSlice";
+import FireLoader from "../Components/FireLoader";
 import SizeSelectorModal from "../Components/SizeSelectorModel";
 
 const ProductDetails = () => {
@@ -17,6 +19,11 @@ const ProductDetails = () => {
   const [chooseSize, setChooseSize] = useState("");
   const [showSizePopup, setShowSizePopup] = useState(false);
 
+  const wishlistItems = useSelector((state) => state.wishlist.wishlistItems);
+  const isWishlisted = product
+    ? wishlistItems.some((item) => item._id === product._id)
+    : false;
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -26,8 +33,8 @@ const ProductDetails = () => {
         setProduct(data);
         setSelectedImage(data.images?.[0]);
         setName(data.name);
-      } catch (error) {
-        console.log(error.message);
+      } catch {
+        toast.error("Product not found");
       }
     };
     fetchProducts();
@@ -35,12 +42,7 @@ const ProductDetails = () => {
 
   if (!product) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center animate-pulse">
-          <div className="w-12 h-12 border-2 border-brand-red border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-brand-muted">Loading product...</p>
-        </div>
-      </div>
+      <FireLoader fullScreen size="lg" text="Loading product..." />
     );
   }
 
@@ -69,12 +71,34 @@ const ProductDetails = () => {
     setShowSizePopup(true);
   };
 
+  const handleWishlist = () => {
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product._id));
+      toast.info("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(product));
+      toast.success("Added to wishlist");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="grid md:grid-cols-2 gap-12">
-        {/* Images */}
         <div className="animate-slide-in-left">
-          <div className="card-dark overflow-hidden p-2">
+          <div className="card-dark overflow-hidden p-2 relative">
+            <button
+              type="button"
+              onClick={handleWishlist}
+              className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full bg-brand-black/70 backdrop-blur-sm flex items-center justify-center border border-brand-border hover:border-brand-red transition-all hover:scale-110"
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              <Heart
+                size={20}
+                className={`transition-all duration-300 ${
+                  isWishlisted ? "fill-brand-red text-brand-red" : "text-white"
+                }`}
+              />
+            </button>
             <img
               src={selectedImage}
               alt={name}
@@ -98,7 +122,6 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Details */}
         <div className="animate-slide-in-right flex flex-col justify-center">
           <p className="text-brand-red uppercase tracking-widest text-sm font-semibold mb-2">
             {product.brand}
@@ -134,10 +157,7 @@ const ProductDetails = () => {
             >
               Add to Cart
             </button>
-            <button
-              onClick={buyNow}
-              className="btn-outline flex-1 py-3.5 text-base"
-            >
+            <button onClick={buyNow} className="btn-outline flex-1 py-3.5 text-base">
               Buy Now
             </button>
           </div>

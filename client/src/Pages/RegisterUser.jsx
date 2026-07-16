@@ -1,22 +1,28 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import API from "../Services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await API.post("/users/register", { name, email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("userInfo", JSON.stringify(data));
-      alert("Registration Successful");
-      window.location.href = "/";
+      toast.success("Account created successfully!");
+      navigate("/");
     } catch (error) {
-      alert("Registration Failed");
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,6 +45,7 @@ const Register = () => {
                 type="text"
                 placeholder="John Doe"
                 className="input-dark"
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
@@ -49,6 +56,7 @@ const Register = () => {
                 type="email"
                 placeholder="you@example.com"
                 className="input-dark"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
@@ -59,12 +67,18 @@ const Register = () => {
                 type="password"
                 placeholder="••••••••"
                 className="input-dark"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
-            <button type="submit" className="btn-primary w-full py-3 mt-2">
-              Create Account
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-3 mt-2 disabled:opacity-50"
+            >
+              {loading ? "Creating..." : "Create Account"}
             </button>
           </form>
 

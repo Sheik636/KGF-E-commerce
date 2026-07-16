@@ -1,8 +1,6 @@
-import  { createSlice } from "@reduxjs/toolkit";
-import { jsxs } from "react/jsx-runtime";
+import { createSlice } from "@reduxjs/toolkit";
 
-
-const initialState ={
+const initialState = {
     cartItems : localStorage.getItem("cartItems")? JSON.parse(localStorage.getItem("cartItems")):[]
 }
 

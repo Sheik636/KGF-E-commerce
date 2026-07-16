@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../Services/api";
 
@@ -16,7 +17,7 @@ const AdminLogin = () => {
       localStorage.setItem("Admintoken", data.token);
       navigate("/admin");
     } catch {
-      alert("Invalid admin credentials");
+      toast.error("Invalid admin credentials");
     } finally {
       setLoading(false);
     }

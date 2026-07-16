@@ -1,22 +1,27 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import API from "../Services/api";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await API.post("/users/login", { email, password });
       localStorage.setItem("token", data.token);
-      alert("Login Successfully");
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      toast.success("Welcome back!");
       navigate("/");
-    } catch (error) {
-      console.log(error.message);
-      alert("Invalid Credentials");
+    } catch {
+      toast.error("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,9 +62,10 @@ function Login() {
             </div>
             <button
               type="submit"
-              className="btn-primary w-full py-3 mt-2 animate-fade-in-up delay-300"
+              disabled={loading}
+              className="btn-primary w-full py-3 mt-2 animate-fade-in-up delay-300 disabled:opacity-50"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 

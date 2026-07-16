@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from "react";
+import { toast } from "react-toastify";
 import API from "../Services/api";
 import ProductCard from "../Components/ProductCard";
 import SearchSideBar from "../Components/SearchSideBar";
+import { FireSkeletonGrid } from "../Components/FireLoader";
 import { SearchContext } from "../context/SearchContext";
-
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,8 +20,8 @@ const Home = () => {
           `/products?keyword=${keyword}&brand=${brand}&sort=${sort}`
         );
         setProducts(data);
-      } catch (error) {
-        console.log(error.message);
+      } catch {
+        toast.error("Failed to load products");
       } finally {
         setLoading(false);
       }
@@ -43,8 +44,8 @@ const Home = () => {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-black">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(229,9,20,0.25),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(229,9,20,0.1),transparent_50%)]" />
+        <div className="fire-hero-glow" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,107,0,0.08),transparent_50%)]" />
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5 animate-spin-slow"
           style={{
@@ -59,7 +60,7 @@ const Home = () => {
           </p>
           <h1 className="font-display text-6xl md:text-8xl text-white mb-4 animate-fade-in-up delay-100">
             WEAR THE{" "}
-            <span className="text-brand-red">POWER</span>
+            <span className="fire-text">POWER</span>
           </h1>
           <p className="text-brand-muted text-lg max-w-xl mx-auto mb-8 animate-fade-in-up delay-200">
             Discover exclusive streetwear crafted for those who dare to stand out.
@@ -90,15 +91,7 @@ const Home = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="card-dark h-96 animate-shimmer rounded-2xl"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              />
-            ))}
-          </div>
+          <FireSkeletonGrid count={8} className="h-96" />
         ) : products.length === 0 ? (
           <div className="text-center py-20 animate-fade-in">
             <p className="font-display text-5xl text-brand-muted mb-4">NO RESULTS</p>

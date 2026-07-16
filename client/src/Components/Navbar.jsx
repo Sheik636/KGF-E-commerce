@@ -5,9 +5,9 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const token = localStorage.getItem("token");
-  const adminToken = localStorage.getItem("adminToken");
 
   const cartItems = useSelector((state) => state.cart.cartItems);
+  const wishlistItems = useSelector((state) => state.wishlist.wishlistItems);
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const { setIsOpen } = useContext(SearchContext);
@@ -21,10 +21,6 @@ const Navbar = () => {
   }, []);
 
   const logoutHandler = () => {
-    if (adminToken) {
-      localStorage.removeItem("adminToken");
-      navigate("/admin/login");
-    }
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
     navigate("/login");
@@ -49,9 +45,24 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link to="/" className="nav-link text-sm hidden sm:block">
             Home
+          </Link>
+
+          {token && (
+            <Link to="/myorders" className="nav-link text-sm hidden md:block">
+              Orders
+            </Link>
+          )}
+
+          <Link to="/wishlist" className="nav-link text-sm flex items-center gap-2">
+            <span className="hidden sm:inline">Wishlist</span>
+            {wishlistItems.length > 0 && (
+              <span className="bg-brand-red text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {wishlistItems.length}
+              </span>
+            )}
           </Link>
 
           <Link to="/cart" className="nav-link text-sm flex items-center gap-2">
@@ -78,7 +89,7 @@ const Navbar = () => {
               <Link to="/login" className="btn-outline text-sm px-4 py-2">
                 Log In
               </Link>
-              <Link to="/register" className="btn-primary text-sm px-4 py-2">
+              <Link to="/register" className="btn-primary text-sm px-4 py-2 hidden sm:inline-block">
                 Sign Up
               </Link>
             </div>

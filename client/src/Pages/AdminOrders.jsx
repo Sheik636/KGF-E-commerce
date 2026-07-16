@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import API from "../Services/api";
 import AdminLayout from "../Components/AdminLayout";
+import FireLoader from "../Components/FireLoader";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,9 +14,8 @@ const AdminOrders = () => {
         setLoading(true);
         const { data } = await API.get("/orders/all");
         setOrders(data);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load orders");
-        console.log(error.message);
       } finally {
         setLoading(false);
       }
@@ -40,9 +40,7 @@ const AdminOrders = () => {
   return (
     <AdminLayout title="ORDERS" subtitle="View and manage customer orders">
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
-        </div>
+        <FireLoader fullScreen size="lg" text="Loading orders..." />
       ) : orders.length === 0 ? (
         <div className="text-center py-20 card-dark animate-fade-in">
           <div className="text-5xl mb-4 animate-float">📦</div>
