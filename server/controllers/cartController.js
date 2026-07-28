@@ -22,14 +22,22 @@ const addToCart = async (req,res)=>
     }
 
 const getCart = async (req,res)=>{
-    const user = await User.findById(req.user._id).populate("cart.product");
-    res.json(user.cart);
+    try {
+        const user = await User.findById(req.user._id).populate("cart.product");
+        res.json(user.cart);
+    } catch (error) {
+      res.status(500).json({message: error.message});   
+    }
 }
 const removeFromCart =async (req,res)=>{
-    const user = await User.findById(req.user._id);
-    user.cart = user.cart.filter((item)=>item.product.toString() !== req.params.id);
-    await user.save();
-    res.json(user.cart)
+    try {
+        const user = await User.findById(req.user._id);
+        user.cart = user.cart.filter((item)=>item.product.toString() !== req.params.id);
+        await user.save();
+        res.json(user.cart);
+    } catch (error) {
+        res.status(500).json({message: error.message});   
+    } 
 };
 const updateCartQuantity =async (req, res) => {
     try {

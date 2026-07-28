@@ -75,8 +75,6 @@ const existingAdmin = async () => {
     } else {
 
       console.log("✅ Admin Already Exists");
-      //testing cloudinary
-      console.log(process.env.CLOUDINARY_CLOUD_NAME)
 
     }
 
