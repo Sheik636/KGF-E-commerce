@@ -13,12 +13,12 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [productsRes, statsRes] = await Promise.all([
+      const [productsRes, statsRes] = await Promise.allSettled([
         API.get("/products"),
         API.get("/admin/stats"),
       ]);
-      setProducts(productsRes.data);
-      setStats(statsRes.data);
+      if (productsRes.status === "fulfilled") setProducts(productsRes.value.data);
+      if (statsRes.status === "fulfilled") setStats(statsRes.value.data);
     } catch {
       toast.error("Failed to load dashboard");
     } finally {
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
             <div
               key={stat.label}
               className="card-dark p-5 text-center animate-fade-in-up"
-              style={{ animationDelay: `${i * 0.08}s`, opacity: 0 }}
+              style={{ animationDelay: `${i * 0.08}s` }}
             >
               <p className="text-brand-muted text-xs uppercase tracking-widest mb-1">
                 {stat.label}
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
             <div
               key={item._id}
               className="card-dark p-4 flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.05}s`, opacity: 0 }}
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
               <img
                 src={item.images?.[0]}

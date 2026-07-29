@@ -6,6 +6,8 @@ import AdminLayout from "../Components/AdminLayout";
 import FireLoader from "../Components/FireLoader";
 import ImageCropper from "../Components/ImageCropper";
 
+const SIZE_OPTIONS = ["S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ const EditProduct = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [brand, setBrand] = useState("");
-  const [sizes, setSizes] = useState("");
+  const [sizes, setSizes] = useState([]);
   const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ const EditProduct = () => {
         setName(data.name);
         setPrice(data.price);
         setBrand(data.brand || "");
-        setSizes((data.sizes || []).join(", "));
+        setSizes(data.sizes || []);
         setStock(data.stock ?? 0);
         setImages(data.images || []);
       } catch {
@@ -47,7 +49,7 @@ const EditProduct = () => {
         name,
         price: Number(price),
         brand,
-        sizes: sizes.split(",").map((s) => s.trim()).filter(Boolean),
+        sizes,
         stock: Number(stock),
         images,
       });
@@ -68,11 +70,16 @@ const EditProduct = () => {
     );
   }
 
+  const toggleSize = (size) => {
+    setSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+    );
+  };
+
   const fields = [
     { label: "Product Name", value: name, setter: setName },
     { label: "Price (₹)", value: price, setter: setPrice, type: "number" },
     { label: "Brand", value: brand, setter: setBrand },
-    { label: "Sizes (comma separated)", value: sizes, setter: setSizes },
     { label: "Stock", value: stock, setter: setStock, type: "number" },
   ];
 
@@ -91,6 +98,26 @@ const EditProduct = () => {
             />
           </div>
         ))}
+
+        <div>
+          <label className="block text-sm text-brand-muted mb-2">Sizes</label>
+          <div className="flex flex-wrap gap-2">
+            {SIZE_OPTIONS.map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => toggleSize(size)}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all duration-300 ${
+                  sizes.includes(size)
+                    ? "bg-brand-red border-brand-red text-white shadow-[0_0_15px_rgba(229,9,20,0.3)]"
+                    : "border-brand-border text-brand-muted hover:border-brand-red hover:text-white bg-brand-dark"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div>
           <label className="block text-sm text-brand-muted mb-2">Product Images</label>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { Heart, Trash2, ShoppingBag } from "lucide-react";
 import { removeFromWishlist } from "../Redux/wishlistSlice";
 import { addToCart } from "../Redux/cartSlice";
 import SizeSelectorModal from "../Components/SizeSelectorModel";
@@ -53,7 +54,9 @@ const Wishlist = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="animate-fade-in-up mb-8">
-        <h1 className="font-display text-5xl text-white tracking-wide">WISHLIST</h1>
+        <h1 className="font-display text-5xl text-white tracking-wide">
+          WISHLIST
+        </h1>
         <div className="w-16 h-0.5 bg-brand-red mt-2" />
         <p className="text-brand-muted mt-2">
           {wishlistItems.length} saved item{wishlistItems.length !== 1 ? "s" : ""}
@@ -61,12 +64,18 @@ const Wishlist = () => {
       </div>
 
       {wishlistItems.length === 0 ? (
-        <div className="text-center py-24 animate-fade-in">
-          <div className="text-6xl mb-4 animate-float">♥</div>
-          <h2 className="font-display text-3xl text-brand-muted mb-2">WISHLIST IS EMPTY</h2>
-          <p className="text-brand-muted mb-6">Save products you love and find them here.</p>
+        <div className="text-center py-24 card-dark animate-fade-in">
+          <div className="w-16 h-16 rounded-full bg-brand-red/10 text-brand-red flex items-center justify-center mx-auto mb-4 animate-float">
+            <Heart size={32} />
+          </div>
+          <h2 className="font-display text-3xl text-brand-muted mb-2">
+            WISHLIST IS EMPTY
+          </h2>
+          <p className="text-brand-muted mb-6">
+            Save items you love by tapping the heart icon on any product.
+          </p>
           <Link to="/" className="btn-primary px-8 py-3 inline-block">
-            Browse Products
+            Browse Catalog
           </Link>
         </div>
       ) : (
@@ -74,33 +83,45 @@ const Wishlist = () => {
           {wishlistItems.map((item, index) => (
             <div
               key={item._id}
-              className="card-dark overflow-hidden animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.08}s`, opacity: 0 }}
+              className="card-dark overflow-hidden group animate-fade-in-up flex flex-col justify-between"
+              style={{ animationDelay: `${index * 0.06}s` }}
             >
-              <Link to={`/product/${item._id}`} className="block relative">
-                <img
-                  src={item.images?.[0]}
-                  alt={item.name}
-                  className="w-full h-64 object-cover"
-                />
-                <div className="p-5">
-                  <h2 className="text-white font-semibold truncate">{item.name}</h2>
-                  <p className="text-brand-red font-bold text-xl mt-1">₹ {item.price}</p>
-                </div>
-              </Link>
+              <div>
+                <Link to={`/product/${item._id}`} className="block relative">
+                  <img
+                    src={item.images?.[0]}
+                    alt={item.name}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="p-5">
+                    <p className="text-brand-red text-xs uppercase font-semibold tracking-wider mb-1">
+                      {item.brand}
+                    </p>
+                    <h2 className="text-white font-semibold truncate group-hover:text-brand-red transition-colors">
+                      {item.name}
+                    </h2>
+                    <p className="text-brand-red font-bold text-xl mt-1">
+                      ₹ {item.price?.toLocaleString()}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+
               <div className="px-5 pb-5 flex gap-2">
                 <button
                   onClick={() => openSizeModal(item)}
-                  className="btn-primary flex-1 py-2 text-sm"
+                  className="btn-primary flex-1 py-2.5 text-sm flex items-center justify-center gap-2"
                 >
+                  <ShoppingBag size={16} />
                   Add to Cart
                 </button>
                 <button
                   onClick={() => handleRemove(item._id)}
-                  className="px-3 py-2 rounded-lg border border-brand-red text-brand-red hover:bg-brand-red hover:text-white transition-all text-sm"
+                  className="p-2.5 rounded-lg border border-brand-border text-brand-muted hover:border-brand-red hover:text-brand-red transition-all"
+                  title="Remove from wishlist"
                   aria-label="Remove from wishlist"
                 >
-                  ✕
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

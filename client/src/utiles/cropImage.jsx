@@ -3,9 +3,12 @@ export const createImage = (url)=> new Promise((resolve, reject)=>{
     const image = new Image();
 
     image.addEventListener("load",()=>resolve(image));
-    image.addEventListener("error",()=>reject(error));
+    image.addEventListener("error",(e)=>reject(e));
 
-    image.setAttribute("crossOrigin","anonymous");
+    // Only set crossOrigin for remote URLs, not data: or blob: URLs
+    if (url.startsWith("http")) {
+      image.setAttribute("crossOrigin","anonymous");
+    }
 
     image.src= url;
 });
@@ -27,8 +30,12 @@ const getCroppedImg= async (imageSrc,pixelCrop)=>{
         pixelCrop.width,
         pixelCrop.height,
     )
-    return new Promise((resolve)=>{
+    return new Promise((resolve, reject)=>{
         canvas.toBlob((blob)=>{
+            if (!blob) {
+                reject(new Error("Failed to create image blob"));
+                return;
+            }
             resolve(blob)
         }, "image/jpeg")
     })

@@ -36,8 +36,9 @@ const ImageCropper = ({ setImages }) => {
       }
       toast.success("Image uploaded");
       setImageSrc(null);
-    } catch {
-      toast.error("Upload failed");
+    } catch (error) {
+      console.error("Upload error:", error.response?.data || error.message || error);
+      toast.error(error.response?.data?.message || "Upload failed");
     } finally {
       setLoading(false);
     }
