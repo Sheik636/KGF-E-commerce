@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Heart, Minus, Plus, ShoppingCart, Zap, Package, Shield, Truck, ChevronLeft, ChevronRight } from "lucide-react";
 import API from "../Services/api";
 import { useParams, useNavigate } from "react-router-dom";
@@ -286,10 +287,11 @@ const ProductDetails = () => {
         </div>
       </div>
 
-      {/* ── Image Lightbox ── */}
-      {lightbox && (
+      {/* ── Image Lightbox (portaled to body to escape stacking context) ── */}
+      {lightbox && createPortal(
         <div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
+          style={{ zIndex: 9999 }}
           onClick={() => setLightbox(false)}
           onKeyDown={(e) => e.key === "Escape" && setLightbox(false)}
           role="dialog"
@@ -341,7 +343,8 @@ const ProductDetails = () => {
             onClick={(e) => e.stopPropagation()}
             className="max-w-[90vw] max-h-[90vh] object-contain rounded-xl animate-scale-in"
           />
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
