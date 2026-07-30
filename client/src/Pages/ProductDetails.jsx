@@ -289,7 +289,7 @@ const ProductDetails = () => {
       {/* ── Image Lightbox ── */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
           onClick={() => setLightbox(false)}
           onKeyDown={(e) => e.key === "Escape" && setLightbox(false)}
           role="dialog"
