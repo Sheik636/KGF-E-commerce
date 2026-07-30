@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../Services/api";
 import { useNavigate } from "react-router-dom";
 import OrderSummary from "../Components/OrderSummary";
@@ -18,6 +18,10 @@ const Checkout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
+
+  useEffect(() => {
+    document.title = "KGF Store — Checkout";
+  }, []);
 
   if (cartItems.length === 0) {
     return (

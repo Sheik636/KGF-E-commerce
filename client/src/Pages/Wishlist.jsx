@@ -12,6 +12,10 @@ const Wishlist = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.title = "KGF Store — My Wishlist";
+  }, []);
+
   const [showSizePopup, setShowSizePopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [chooseSize, setChooseSize] = useState("");

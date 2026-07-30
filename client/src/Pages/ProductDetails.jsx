@@ -33,6 +33,7 @@ const ProductDetails = () => {
         const { data } = await API.get(`/products/${id}`);
         setProduct(data);
         setSelectedImage(data.images?.[0]);
+        document.title = `${data.name || "Product"} — KGF Store`;
       } catch {
         toast.error("Product not found");
       }

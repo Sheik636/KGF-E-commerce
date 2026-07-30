@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import API from "../Services/api";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,6 +9,10 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "KGF Store — Create Account";
+  }, []);
 
   const submitHandler = async (e) => {
     e.preventDefault();

@@ -15,6 +15,10 @@ const Cart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
 
+  useEffect(() => {
+    document.title = "KGF Store — Shopping Cart";
+  }, []);
+
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0

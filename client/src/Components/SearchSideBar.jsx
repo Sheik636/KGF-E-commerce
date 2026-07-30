@@ -1,9 +1,12 @@
 import { useContext } from "react";
 import { SearchContext } from "../context/SearchContext";
+import { Filter, X, RotateCcw } from "lucide-react";
 
-const SearchSideBar = () => {
+const SearchSideBar = ({ brands = [] }) => {
   const { isOpen, setIsOpen, keyword, setKeyword, brand, setBrand, sort, setSort } =
     useContext(SearchContext);
+
+  const activeFilterCount = [keyword, brand, sort].filter(Boolean).length;
 
   return (
     <>
@@ -14,76 +17,93 @@ const SearchSideBar = () => {
         />
       )}
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-brand-dark border-r border-brand-border shadow-[4px_0_40px_rgba(0,0,0,0.5)] z-50 p-6 transition-transform duration-500 ease-out ${
+        className={`fixed top-0 left-0 h-full w-80 bg-brand-dark border-r border-brand-border shadow-[4px_0_40px_rgba(0,0,0,0.5)] z-50 p-6 transition-transform duration-500 ease-out flex flex-col justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="font-display text-3xl text-white tracking-wide">
-            FILTER
-          </h2>
-          <button
-            className="text-brand-muted hover:text-brand-red transition-colors w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:border-brand-red"
-            onClick={() => setIsOpen(false)}
-          >
-            ✕
-          </button>
+        <div>
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-2">
+              <Filter size={20} className="text-brand-red" />
+              <h2 className="font-display text-3xl text-white tracking-wide">
+                FILTERS
+              </h2>
+              {activeFilterCount > 0 && (
+                <span className="bg-brand-red text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </div>
+            <button
+              className="text-brand-muted hover:text-brand-red transition-colors w-8 h-8 flex items-center justify-center rounded-lg border border-brand-border hover:border-brand-red"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close filters"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="animate-fade-in-up delay-100">
+              <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2 font-medium">
+                Search Keyword
+              </label>
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search products..."
+                className="input-dark"
+              />
+            </div>
+
+            <div className="animate-fade-in-up delay-200">
+              <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2 font-medium">
+                Brand
+              </label>
+              <select
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="input-dark"
+              >
+                <option value="">All Brands</option>
+                {brands.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="animate-fade-in-up delay-300">
+              <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2 font-medium">
+                Sort By Price
+              </label>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="input-dark"
+              >
+                <option value="">Default Order</option>
+                <option value="lowToHigh">Price: Low to High</option>
+                <option value="highToLow">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="animate-fade-in-up delay-100">
-            <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2">
-              Search
-            </label>
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Search products..."
-              className="input-dark"
-            />
-          </div>
-
-          <div className="animate-fade-in-up delay-200">
-            <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2">
-              Brand
-            </label>
-            <select
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              className="input-dark"
-            >
-              <option value="">All Brands</option>
-              <option value="Polo">Polo T-Shirts</option>
-              <option value="Trackpant">Track Pant</option>
-            </select>
-          </div>
-
-          <div className="animate-fade-in-up delay-300">
-            <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2">
-              Sort By
-            </label>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="input-dark"
-            >
-              <option value="lowToHigh">Price: Low to High</option>
-              <option value="highToLow">Price: High to Low</option>
-            </select>
-          </div>
-
+        {activeFilterCount > 0 && (
           <button
             onClick={() => {
               setKeyword("");
               setBrand("");
               setSort("");
             }}
-            className="btn-outline w-full py-3 mt-4 animate-fade-in-up delay-400"
+            className="btn-outline w-full py-3 flex items-center justify-center gap-2 animate-fade-in"
           >
-            Clear Filters
+            <RotateCcw size={16} /> Reset Filters
           </button>
-        </div>
+        )}
       </div>
     </>
   );

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { addToCart } from "../Redux/cartSlice";
 import { addToWishlist, removeFromWishlist } from "../Redux/wishlistSlice";
 import SizeSelectorModal from "./SizeSelectorModel";
@@ -17,16 +17,17 @@ const ProductCard = ({ product }) => {
 
   const wishlistItems = useSelector((state) => state.wishlist.wishlistItems);
   const isWishlisted = wishlistItems.some((item) => item._id === product._id);
+  const inStock = product.stock > 0;
 
   const handleAddToCart = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.warning("Login Required..!");
+      toast.warning("Login Required");
       navigate("/login");
       return;
     }
     if (!chooseSize) {
-      toast.warning("Please Select a Size");
+      toast.warning("Please select a size");
       return;
     }
     dispatch(
@@ -36,7 +37,7 @@ const ProductCard = ({ product }) => {
         quantity: 1,
       })
     );
-    toast.success("Added to Cart");
+    toast.success("Added to cart");
     setShowSizePopup(false);
     setChooseSize("");
   };
@@ -54,8 +55,8 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="card-dark overflow-hidden group">
-      <Link to={`/product/${product._id}`} className="block relative">
+    <div className="card-dark overflow-hidden group flex flex-col justify-between h-full">
+      <Link to={`/product/${product._id}`} className="block relative flex-1">
         <div className="relative overflow-hidden bg-brand-dark">
           <button
             type="button"
@@ -70,6 +71,12 @@ const ProductCard = ({ product }) => {
               }`}
             />
           </button>
+
+          {!inStock && (
+            <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-red-500/80 backdrop-blur-sm text-white text-[11px] font-bold uppercase tracking-wider shadow-lg">
+              Out of Stock
+            </div>
+          )}
 
           {!imgLoaded && (
             <div className="absolute inset-0 animate-shimmer bg-brand-border/30" />
@@ -91,10 +98,17 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="p-5">
+          {product.brand && (
+            <p className="text-brand-red text-xs font-semibold uppercase tracking-widest mb-1">
+              {product.brand}
+            </p>
+          )}
           <h2 className="text-white text-lg font-semibold truncate group-hover:text-brand-red transition-colors duration-300">
             {product.name}
           </h2>
-          <p className="text-brand-red font-bold text-xl mt-1">₹ {product.price}</p>
+          <p className="text-brand-red font-bold text-xl mt-1">
+            ₹ {product.price?.toLocaleString()}
+          </p>
         </div>
       </Link>
 
@@ -102,20 +116,25 @@ const ProductCard = ({ product }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
+            if (!inStock) return;
             setShowSizePopup(true);
           }}
-          className="btn-primary w-full py-2.5 text-sm"
+          disabled={!inStock}
+          className="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
         >
-          Add to Cart
+          <ShoppingBag size={16} />
+          {inStock ? "Add to Cart" : "Out of Stock"}
         </button>
-        <SizeSelectorModal
-          show={showSizePopup}
-          onClose={() => setShowSizePopup(false)}
-          sizes={product?.sizes}
-          chooseSize={chooseSize}
-          setChooseSize={setChooseSize}
-          onConfirm={handleAddToCart}
-        />
+        {inStock && (
+          <SizeSelectorModal
+            show={showSizePopup}
+            onClose={() => setShowSizePopup(false)}
+            sizes={product?.sizes}
+            chooseSize={chooseSize}
+            setChooseSize={setChooseSize}
+            onConfirm={handleAddToCart}
+          />
+        )}
       </div>
     </div>
   );

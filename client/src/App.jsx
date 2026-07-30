@@ -21,6 +21,7 @@ import AdminOrders from "./Pages/AdminOrders";
 import AdminUsers from "./Pages/AdminUsers";
 import ProductDetails from "./Pages/ProductDetails";
 import NotFound from "./Pages/NotFound";
+import ScrollToTop from "./Components/ScrollToTop";
 
 function AppContent() {
   const location = useLocation();
@@ -137,6 +138,7 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AppContent />
     </BrowserRouter>
   );
