@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { Heart, Trash2, ShoppingBag } from "lucide-react";
-import { removeFromWishlist } from "../Redux/wishlistSlice";
+import {
+  removeFromWishlist,
+  fetchWishlist,
+  syncRemoveFromWishlist,
+} from "../Redux/wishlistSlice";
 import { addToCart } from "../Redux/cartSlice";
 import SizeSelectorModal from "../Components/SizeSelectorModel";
 
@@ -14,14 +18,18 @@ const Wishlist = () => {
 
   useEffect(() => {
     document.title = "KGF Store — My Wishlist";
-  }, []);
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch]);
 
   const [showSizePopup, setShowSizePopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [chooseSize, setChooseSize] = useState("");
 
   const handleRemove = (id) => {
-    dispatch(removeFromWishlist(id));
+    dispatch(syncRemoveFromWishlist(id));
     toast.info("Removed from wishlist");
   };
 

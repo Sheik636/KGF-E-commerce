@@ -6,9 +6,12 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
+  createProductReview,
+  deleteProductReview,
 } = require("../controllers/productController");
 const upload = require("../middleware/uploadMiddleware");
 const { adminProtect } = require("../middleware/adminMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 router.get("/", getProducts);
 
@@ -20,6 +23,8 @@ router.post("/upload", adminProtect, upload.single("image"), (req, res) => {
 });
 
 router.get("/:id", getProductById);
+router.post("/:id/reviews", protect, createProductReview);
+router.delete("/:id/reviews/:reviewId", protect, deleteProductReview);
 router.post("/", adminProtect, createProduct);
 router.put("/:id", adminProtect, updateProduct);
 router.delete("/:id", adminProtect, deleteProduct);

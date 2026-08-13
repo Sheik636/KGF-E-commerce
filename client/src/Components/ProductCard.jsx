@@ -2,9 +2,12 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart, ShoppingBag, Star } from "lucide-react";
 import { addToCart } from "../Redux/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../Redux/wishlistSlice";
+import {
+  syncAddToWishlist,
+  syncRemoveFromWishlist,
+} from "../Redux/wishlistSlice";
 import SizeSelectorModal from "./SizeSelectorModel";
 
 const ProductCard = ({ product }) => {
@@ -46,10 +49,10 @@ const ProductCard = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     if (isWishlisted) {
-      dispatch(removeFromWishlist(product._id));
+      dispatch(syncRemoveFromWishlist(product._id));
       toast.info("Removed from wishlist");
     } else {
-      dispatch(addToWishlist(product));
+      dispatch(syncAddToWishlist(product));
       toast.success("Added to wishlist");
     }
   };
@@ -98,11 +101,24 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="p-5">
-          {product.brand && (
-            <p className="text-brand-red text-xs font-semibold uppercase tracking-widest mb-1">
-              {product.brand}
-            </p>
-          )}
+          <div className="flex items-center justify-between gap-2 mb-1">
+            {product.brand ? (
+              <p className="text-brand-red text-xs font-semibold uppercase tracking-widest">
+                {product.brand}
+              </p>
+            ) : <span />}
+            <div className="flex items-center gap-1 bg-brand-dark/80 px-2 py-0.5 rounded border border-brand-border text-xs">
+              <Star size={12} className="fill-amber-400 text-amber-400" />
+              <span className="text-white font-medium">
+                {product.rating ? product.rating.toFixed(1) : "New"}
+              </span>
+              {product.numReviews > 0 && (
+                <span className="text-brand-muted text-[11px]">
+                  ({product.numReviews})
+                </span>
+              )}
+            </div>
+          </div>
           <h2 className="text-white text-lg font-semibold truncate group-hover:text-brand-red transition-colors duration-300">
             {product.name}
           </h2>

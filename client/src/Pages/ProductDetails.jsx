@@ -288,6 +288,105 @@ const ProductDetails = () => {
         </div>
       </div>
 
+      {/* ── Customer Reviews & Ratings Section ── */}
+      <div className="mt-16 pt-10 border-t border-brand-border animate-fade-in">
+        <h2 className="font-display text-3xl text-white mb-6">
+          CUSTOMER REVIEWS & RATINGS
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-8 mb-10">
+          {/* Rating Summary Card */}
+          <div className="card-dark p-6 flex flex-col items-center justify-center text-center">
+            <h3 className="text-5xl font-extrabold text-white mb-2">
+              {product.rating ? product.rating.toFixed(1) : "0.0"}
+            </h3>
+            <div className="flex gap-1 mb-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={20}
+                  className={
+                    star <= Math.round(product.rating || 0)
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-brand-border"
+                  }
+                />
+              ))}
+            </div>
+            <p className="text-brand-muted text-sm">
+              Based on {product.numReviews || 0} customer review
+              {product.numReviews !== 1 ? "s" : ""}
+            </p>
+          </div>
+
+          {/* Review Submission Form */}
+          <div className="md:col-span-2 card-dark p-6">
+            <h3 className="text-xl font-bold text-white mb-4">
+              Write a Product Review
+            </h3>
+            <ReviewForm productId={product._id} onReviewAdded={() => {
+              API.get(`/products/${id}`).then(({ data }) => setProduct(data));
+            }} />
+          </div>
+        </div>
+
+        {/* Reviews List */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-white mb-4">
+            Recent Feedback ({product.reviews?.length || 0})
+          </h3>
+
+          {product.reviews?.length === 0 ? (
+            <div className="card-dark p-8 text-center text-brand-muted">
+              No reviews yet. Be the first to share your experience!
+            </div>
+          ) : (
+            product.reviews?.map((rev) => (
+              <div key={rev._id || rev.createdAt} className="card-dark p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-brand-red/20 border border-brand-red/40 text-brand-red flex items-center justify-center font-bold uppercase">
+                      {rev.name?.charAt(0) || "U"}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-white font-semibold">{rev.name}</h4>
+                        <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/30">
+                          Verified Buyer
+                        </span>
+                      </div>
+                      <span className="text-brand-muted text-xs">
+                        {rev.createdAt
+                          ? new Date(rev.createdAt).toLocaleDateString("en-IN", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })
+                          : "Recently"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={14}
+                        className={
+                          star <= rev.rating
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-brand-border"
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-[#ccc] text-sm mt-3">{rev.comment}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       {/* ── Image Lightbox (portaled to body to escape stacking context) ── */}
       {lightbox && createPortal(
         <div
@@ -348,6 +447,88 @@ const ProductDetails = () => {
         document.body
       )}
     </div>
+  );
+};
+
+// Inline helper component for submitting reviews
+const ReviewForm = ({ productId, onReviewAdded }) => {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Login required to submit review");
+      return navigate("/login");
+    }
+    if (!comment.trim()) {
+      return toast.warning("Please write a comment");
+    }
+    try {
+      setSubmitting(true);
+      await API.post(`/products/${productId}/reviews`, { rating, comment });
+      toast.success("Review submitted!");
+      setComment("");
+      setRating(5);
+      if (onReviewAdded) onReviewAdded();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2">
+          Your Rating
+        </label>
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              type="button"
+              key={star}
+              onClick={() => setRating(star)}
+              className="p-1 hover:scale-125 transition-transform"
+            >
+              <Star
+                size={24}
+                className={
+                  star <= rating
+                    ? "fill-amber-400 text-amber-400"
+                    : "text-brand-border"
+                }
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2">
+          Your Review Comment
+        </label>
+        <textarea
+          rows={3}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Share details of your experience with this item..."
+          className="w-full bg-brand-dark border border-brand-border rounded-lg p-3 text-white focus:border-brand-red focus:outline-none transition-colors text-sm"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn-primary py-2.5 px-6 text-sm flex items-center gap-2"
+      >
+        {submitting ? "Submitting..." : "Submit Review"}
+      </button>
+    </form>
   );
 };
 

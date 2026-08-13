@@ -14,7 +14,9 @@ API.interceptors.request.use((req) => {
     url.startsWith("/admin") ||
     url === "/orders/all" ||
     url.includes("/deliver") ||
-    (url.startsWith("/products") && method !== "get");
+    url.includes("/status") ||
+    (url.startsWith("/coupons") && url !== "/coupons/apply") ||
+    (url.startsWith("/products") && method !== "get" && !url.includes("/reviews"));
 
   const token = needsAdminToken && adminToken ? adminToken : userToken;
 

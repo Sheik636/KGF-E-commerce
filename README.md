@@ -123,14 +123,14 @@ npm start
 
 ---
 
-## 🌟 Future Improvements
+## 🔥 Phase-2 Implemented Features
 
-- Wishlist System
-- Product Reviews & Ratings
-- Coupon System
-- Admin Analytics Dashboard
-- Email Notifications
-- Order Tracking
+- ✅ **Product Reviews & Ratings System** (Verified buyer reviews, star rating summary breakdown, interactive star review form).
+- ✅ **Promo & Coupon System** (Admin promo code creator, expiration & min purchase validation, checkout discount line items).
+- ✅ **Live Order Tracking Timeline** (Multi-stage visual stepper: Placed ➔ Processing ➔ Shipped ➔ Delivered, tracking ID & carrier details).
+- ✅ **Order Cancellation & Stock Restoration** (User self-service cancellation for pending orders).
+- ✅ **Admin Analytics Dashboard** (Store metrics, revenue charts, category sales distribution, order status breakdown).
+- ✅ **Cloud Wishlist Synchronization** (Persisted MongoDB wishlist backend sync for logged-in users).
 
 ---
 

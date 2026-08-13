@@ -12,6 +12,7 @@ const userRoutes = require("./Routes/userRoute");
 const adminRoutes = require("./Routes/adminRoute");
 const cartRoute = require("./Routes/cartRoute");
 const orderRoute = require("./Routes/orderRoute");
+const couponRoute = require("./Routes/couponRoute");
 
 const Admin = require("./models/adminModel");
 
@@ -48,6 +49,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/cart", cartRoute);
 
 app.use("/api/orders", orderRoute);
+
+app.use("/api/coupons", couponRoute);
 
 
 // create admin if not exists

@@ -32,6 +32,33 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+    couponCode: {
+      type: String,
+      default: "",
+    },
+    status: {
+      type: String,
+      enum: ["Placed", "Processing", "Shipped", "Delivered", "Cancelled"],
+      default: "Placed",
+    },
+    statusHistory: [
+      {
+        status: { type: String },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
+    trackingNumber: {
+      type: String,
+      default: "",
+    },
+    carrier: {
+      type: String,
+      default: "",
+    },
     isPaid: {
       type: Boolean,
       default: false,

@@ -39,16 +39,17 @@ const Checkout = () => {
     );
   }
 
-  const placeOrder = async () => {
+  const placeOrder = async (discountAmount = 0, couponCode = "") => {
     if (!name.trim() || !address.trim() || !city.trim() || !postalCode.trim() || !country.trim()) {
       return toast.warning("Please fill all shipping details");
     }
     try {
       setLoading(true);
       const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-      const shipping = subtotal > 1000 ? 0 : 99;
-      const tax = Math.round(subtotal * 0.05);
-      const total = subtotal + shipping + tax;
+      const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
+      const shipping = subtotalAfterDiscount > 1000 ? 0 : 99;
+      const tax = Math.round(subtotalAfterDiscount * 0.05);
+      const total = subtotalAfterDiscount + shipping + tax;
 
       await API.post(
         "/orders",
@@ -63,6 +64,8 @@ const Checkout = () => {
           })),
           shippingAddress: { name, address, city, postalCode, country },
           subtotal,
+          discountAmount,
+          couponCode,
           shipping,
           tax,
           total,

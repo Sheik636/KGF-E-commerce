@@ -32,14 +32,63 @@ const getUsers = async (req, res) => {
 
 const getStats = async (req, res) => {
   try {
-    const [productCount, orderCount, userCount, orders] = await Promise.all([
-      Product.countDocuments(),
-      Order.countDocuments(),
-      User.countDocuments(),
-      Order.find({ isPaid: true }).select("totalPrice"),
-    ]);
-    const revenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
-    res.json({ productCount, orderCount, userCount, revenue });
+    const [productCount, orderCount, userCount, allOrders, recentOrders, products] =
+      await Promise.all([
+        Product.countDocuments(),
+        Order.countDocuments(),
+        User.countDocuments(),
+        Order.find().select("totalPrice isPaid status catogery orderItems"),
+        Order.find()
+          .sort({ createdAt: -1 })
+          .limit(6)
+          .populate("user", "name email"),
+        Product.find().select("catogery price stock"),
+      ]);
+
+    const revenue = allOrders
+      .filter((o) => o.status !== "Cancelled")
+      .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+
+    const paidOrdersCount = allOrders.filter((o) => o.isPaid).length;
+    const avgOrderValue =
+      orderCount > 0 ? Math.round(revenue / (allOrders.length || 1)) : 0;
+
+    const statusCounts = {
+      Placed: 0,
+      Processing: 0,
+      Shipped: 0,
+      Delivered: 0,
+      Cancelled: 0,
+    };
+
+    allOrders.forEach((o) => {
+      if (statusCounts[o.status] !== undefined) {
+        statusCounts[o.status]++;
+      }
+    });
+
+    const categoryMap = {};
+    products.forEach((p) => {
+      const cat = p.catogery || "Uncategorized";
+      categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+    });
+
+    const categoryBreakdown = Object.keys(categoryMap).map((cat) => ({
+      category: cat,
+      count: categoryMap[cat],
+    }));
+
+    res.json({
+      productCount,
+      orderCount,
+      userCount,
+      revenue,
+      avgOrderValue,
+      paidOrdersCount,
+      statusCounts,
+      categoryBreakdown,
+      recentOrders,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

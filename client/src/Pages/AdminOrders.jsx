@@ -24,18 +24,44 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
+  const [trackingModal, setTrackingModal] = useState(null);
+  const [carrier, setCarrier] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+
+  const updateStatusHandler = async (id, status, carrierName = "", trackingNum = "") => {
+    try {
+      const { data } = await API.put(`/orders/${id}/status`, {
+        status,
+        carrier: carrierName,
+        trackingNumber: trackingNum,
+      });
+      setOrders(orders.map((order) => (order._id === id ? data : order)));
+      toast.success(`Order status updated to ${status}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update order status");
+    }
+  };
+
   const deliverHandler = async (id) => {
     try {
-      await API.put(`/orders/${id}/deliver`, {});
-      setOrders(
-        orders.map((order) =>
-          order._id === id ? { ...order, isDelivered: true } : order
-        )
-      );
-      toast.success("Order marked as delivered");
+      await updateStatusHandler(id, "Delivered");
     } catch {
       toast.error("Failed to update order");
     }
+  };
+
+  const saveTrackingInfo = async (e) => {
+    e.preventDefault();
+    if (!trackingModal) return;
+    await updateStatusHandler(
+      trackingModal._id,
+      trackingModal.status || "Shipped",
+      carrier,
+      trackingNumber
+    );
+    setTrackingModal(null);
+    setCarrier("");
+    setTrackingNumber("");
   };
 
   return (
@@ -138,37 +164,109 @@ const AdminOrders = () => {
               ))}
             </div>
 
-            {/* Status & Deliver Action */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-brand-border/50">
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                  order.isPaid
-                    ? "bg-green-500/15 text-green-400 border border-green-500/30"
-                    : "bg-brand-red/15 text-brand-red border border-brand-red/30"
-                }`}
-              >
-                {order.isPaid ? <><CheckCircle2 size={14} /> Paid</> : <><Clock size={14} /> Not Paid</>}
-              </span>
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                  order.isDelivered
-                    ? "bg-green-500/15 text-green-400 border border-green-500/30"
-                    : "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30"
-                }`}
-              >
-                {order.isDelivered ? <><CheckCircle2 size={14} /> Delivered</> : <><Clock size={14} /> Pending Delivery</>}
-              </span>
-              {order.isPaid && !order.isDelivered && (
-                <button
-                  onClick={() => deliverHandler(order._id)}
-                  className="btn-primary ml-auto px-6 py-2 text-sm flex items-center gap-2"
+            {/* Status & Actions */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-brand-border/50">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                    order.isPaid
+                      ? "bg-green-500/15 text-green-400 border border-green-500/30"
+                      : "bg-brand-red/15 text-brand-red border border-brand-red/30"
+                  }`}
                 >
-                  <Truck size={16} /> Mark Delivered
+                  {order.isPaid ? <><CheckCircle2 size={14} /> Paid</> : <><Clock size={14} /> Not Paid</>}
+                </span>
+
+                {/* Status Dropdown */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-brand-muted font-medium">Status:</span>
+                  <select
+                    value={order.status || (order.isDelivered ? "Delivered" : "Placed")}
+                    onChange={(e) => updateStatusHandler(order._id, e.target.value, order.carrier, order.trackingNumber)}
+                    className="bg-brand-dark border border-brand-border text-white text-xs font-semibold rounded-lg px-2.5 py-1 focus:border-brand-red focus:outline-none"
+                  >
+                    <option value="Placed">Placed</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setTrackingModal(order);
+                    setCarrier(order.carrier || "BlueDart / FedEx");
+                    setTrackingNumber(order.trackingNumber || "");
+                  }}
+                  className="btn-outline px-4 py-1.5 text-xs flex items-center gap-1.5"
+                >
+                  <Truck size={14} /> Add/Edit Tracking
                 </button>
-              )}
+
+                {order.isPaid && !order.isDelivered && (
+                  <button
+                    onClick={() => deliverHandler(order._id)}
+                    className="btn-primary px-4 py-1.5 text-xs flex items-center gap-1.5"
+                  >
+                    <CheckCircle2 size={14} /> Mark Delivered
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))
+      )}
+
+      {/* Tracking Modal */}
+      {trackingModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="card-dark max-w-md w-full p-6 animate-scale-in">
+            <h3 className="font-display text-2xl text-white mb-4">
+              UPDATE TRACKING INFO
+            </h3>
+            <form onSubmit={saveTrackingInfo} className="space-y-4">
+              <div>
+                <label className="block text-xs text-brand-muted uppercase mb-1">
+                  Courier Carrier
+                </label>
+                <input
+                  type="text"
+                  value={carrier}
+                  onChange={(e) => setCarrier(e.target.value)}
+                  placeholder="e.g. DHL, BlueDart, FedEx"
+                  className="input-dark"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-brand-muted uppercase mb-1">
+                  Tracking Number / AWB
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  placeholder="e.g. AWB98410294"
+                  className="input-dark"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setTrackingModal(null)}
+                  className="px-4 py-2 rounded-lg border border-brand-border text-brand-muted hover:text-white text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary px-5 py-2 text-xs">
+                  Save Details
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </AdminLayout>
   );
