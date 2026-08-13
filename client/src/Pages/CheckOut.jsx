@@ -5,10 +5,13 @@ import OrderSummary from "../Components/OrderSummary";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../Redux/cartSlice";
-import { ShieldCheck, MapPin } from "lucide-react";
+import { ShieldCheck, MapPin, CheckCircle, Plus } from "lucide-react";
 
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddrId, setSelectedAddrId] = useState(null);
+
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
@@ -21,7 +24,43 @@ const Checkout = () => {
 
   useEffect(() => {
     document.title = "KGF Store — Checkout";
+    const fetchSavedAddresses = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const { data } = await API.get("/users/addresses");
+          if (data && data.length > 0) {
+            setSavedAddresses(data);
+            // Pre-select most recent saved address
+            const latest = data[data.length - 1];
+            selectAddress(latest);
+          }
+        }
+      } catch (err) {
+        console.log("Could not load saved addresses:", err.message);
+      }
+    };
+    fetchSavedAddresses();
   }, []);
+
+  const selectAddress = (addr) => {
+    setSelectedAddrId(addr._id || addr.address);
+    setName(addr.name || "");
+    setAddress(addr.address || "");
+    setCity(addr.city || "");
+    setPostalCode(addr.postalCode || "");
+    setCountry(addr.country || "India");
+    toast.info(`Selected saved address for ${addr.name}`);
+  };
+
+  const useNewAddress = () => {
+    setSelectedAddrId("new");
+    setName("");
+    setAddress("");
+    setCity("");
+    setPostalCode("");
+    setCountry("India");
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -98,14 +137,65 @@ const Checkout = () => {
           CHECKOUT
         </h1>
         <div className="w-16 h-0.5 bg-brand-red mt-2" />
-        <p className="text-brand-muted mt-2">Enter your shipping details below</p>
+        <p className="text-brand-muted mt-2">Select a saved address or enter a new one</p>
       </div>
+
+      {/* ── Saved Addresses Quick Selector ── */}
+      {savedAddresses.length > 0 && (
+        <div className="mb-8 card-dark p-6 animate-fade-in-up">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-xl text-white tracking-wide flex items-center gap-2">
+              <MapPin size={20} className="text-brand-red" />
+              CHOOSE SAVED ADDRESS ({savedAddresses.length})
+            </h2>
+            <button
+              onClick={useNewAddress}
+              className="btn-outline text-xs px-3 py-1.5 flex items-center gap-1"
+            >
+              <Plus size={14} /> Enter New Address
+            </button>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {savedAddresses.map((addr, idx) => {
+              const isSelected = selectedAddrId === (addr._id || addr.address);
+              return (
+                <div
+                  key={addr._id || idx}
+                  onClick={() => selectAddress(addr)}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${
+                    isSelected
+                      ? "bg-brand-dark border-brand-red shadow-[0_0_15px_rgba(229,9,20,0.3)] ring-1 ring-brand-red"
+                      : "bg-brand-dark/50 border-brand-border hover:border-brand-red/50 hover:bg-brand-dark"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-white font-semibold text-sm">{addr.name}</p>
+                      <p className="text-brand-muted text-xs mt-1 leading-relaxed">
+                        {addr.address}, {addr.city} {addr.postalCode}, {addr.country}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <CheckCircle size={18} className="text-brand-red shrink-0 ml-2" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="card-dark p-6 space-y-4 animate-slide-in-left">
           <div className="flex items-center gap-2 mb-2 pb-3 border-b border-brand-border">
             <MapPin size={20} className="text-brand-red" />
-            <h2 className="font-semibold text-white text-lg">Shipping Address</h2>
+            <h2 className="font-semibold text-white text-lg">
+              {selectedAddrId && selectedAddrId !== "new"
+                ? "Selected Shipping Address"
+                : "Shipping Address Details"}
+            </h2>
           </div>
 
           {fields.map((field, i) => (
@@ -121,7 +211,10 @@ const Checkout = () => {
                 type="text"
                 placeholder={field.placeholder}
                 value={field.value}
-                onChange={(e) => field.setter(e.target.value)}
+                onChange={(e) => {
+                  setSelectedAddrId("new");
+                  field.setter(e.target.value);
+                }}
                 className="input-dark"
                 required
               />
@@ -130,7 +223,7 @@ const Checkout = () => {
 
           <div className="flex items-center gap-2 text-xs text-brand-muted pt-2 border-t border-brand-border/50">
             <ShieldCheck size={16} className="text-green-400 shrink-0" />
-            <span>Your information is protected by 256-bit encryption</span>
+            <span>Your address will be automatically saved for your next order</span>
           </div>
         </div>
 

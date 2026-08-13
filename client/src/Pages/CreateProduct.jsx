@@ -4,13 +4,24 @@ import { toast } from "react-toastify";
 import API from "../Services/api";
 import AdminLayout from "../Components/AdminLayout";
 import ImageCropper from "../Components/ImageCropper";
+import { Tag } from "lucide-react";
 
 const SIZE_OPTIONS = ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
+
+const PRESET_CATEGORIES = [
+  { name: "T-Shirt", icon: "👕" },
+  { name: "Trackpant", icon: "👖" },
+  { name: "Hoodies", icon: "🧥" },
+  { name: "Jackets", icon: "🧥" },
+  { name: "Shoes", icon: "👟" },
+];
 
 const CreateProduct = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [brand, setBrand] = useState("");
+  const [catogery, setCatogery] = useState("T-Shirt");
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [sizes, setSizes] = useState([]);
   const [stock, setStock] = useState("");
   const [images, setImages] = useState([]);
@@ -20,12 +31,16 @@ const CreateProduct = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    if (!catogery.trim()) {
+      return toast.warning("Please select or enter a category");
+    }
     try {
       setLoading(true);
       await API.post("/products", {
         name,
         price: Number(price),
         brand,
+        catogery,
         sizes,
         stock: Number(stock) || 0,
         images,
@@ -68,6 +83,69 @@ const CreateProduct = () => {
             />
           </div>
         ))}
+
+        {/* ── Product Category Selection Chips ── */}
+        <div>
+          <label className="block text-sm text-brand-muted mb-2 font-medium">
+            Product Category
+          </label>
+          <div className="flex flex-wrap gap-2.5 mb-2">
+            {PRESET_CATEGORIES.map((cat) => {
+              const isSelected = catogery === cat.name && !isCustomCategory;
+              return (
+                <button
+                  key={cat.name}
+                  type="button"
+                  onClick={() => {
+                    setCatogery(cat.name);
+                    setIsCustomCategory(false);
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all duration-300 ${
+                    isSelected
+                      ? "bg-brand-red border-brand-red text-white shadow-[0_0_15px_rgba(229,9,20,0.4)] scale-105"
+                      : "bg-brand-dark border-brand-border text-brand-muted hover:border-brand-red/50 hover:text-white"
+                  }`}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsCustomCategory(true);
+                if (PRESET_CATEGORIES.some((c) => c.name === catogery)) {
+                  setCatogery("");
+                }
+              }}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all duration-300 ${
+                isCustomCategory
+                  ? "bg-brand-red border-brand-red text-white shadow-[0_0_15px_rgba(229,9,20,0.4)] scale-105"
+                  : "bg-brand-dark border-brand-border text-brand-muted hover:border-brand-red/50 hover:text-white"
+              }`}
+            >
+              <span>✏️</span>
+              <span>Custom Category</span>
+            </button>
+          </div>
+
+          {/* Custom Category Text Input */}
+          {isCustomCategory && (
+            <div className="relative animate-fade-in-up mt-3">
+              <input
+                type="text"
+                placeholder="Enter custom category name (e.g. Shorts, Accessories)..."
+                value={catogery}
+                onChange={(e) => setCatogery(e.target.value)}
+                className="input-dark pl-10"
+                required
+              />
+              <Tag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-red" />
+            </div>
+          )}
+        </div>
 
         <div>
           <label className="block text-sm text-brand-muted mb-2">Sizes</label>

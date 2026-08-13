@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 const razorpay = require("../config/razorpay");
 const crypto = require("crypto");
 
@@ -49,6 +50,20 @@ const createOrder = async (req, res) => {
     });
 
     const savedOrder = await order.save();
+
+    // Auto-save shipping address to user profile if not already saved
+    const userObj = await User.findById(req.user._id);
+    if (userObj) {
+      const exists = userObj.addresses?.some(
+        (addr) =>
+          addr.address?.toLowerCase() === address.toLowerCase() &&
+          addr.postalCode === postalCode
+      );
+      if (!exists) {
+        userObj.addresses.push({ name, address, city, postalCode, country });
+        await userObj.save();
+      }
+    }
 
     for (const item of orderItems) {
       await Product.findByIdAndUpdate(item.product, {

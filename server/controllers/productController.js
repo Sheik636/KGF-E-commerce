@@ -2,14 +2,39 @@ const Product = require("../models/productModel");
 
 const getProducts = async (req, res) => {
   try {
-    const keyword = req.query.keyword
-      ? { name: { $regex: req.query.keyword, $options: "i" } }
-      : {};
-    const brand = req.query.brand ? { brand: req.query.brand } : {};
+    const queryObj = {};
+
+    if (req.query.keyword) {
+      queryObj.$or = [
+        { name: { $regex: req.query.keyword, $options: "i" } },
+        { catogery: { $regex: req.query.keyword, $options: "i" } },
+        { description: { $regex: req.query.keyword, $options: "i" } },
+      ];
+    }
+
+    if (req.query.brand) {
+      queryObj.brand = req.query.brand;
+    }
+
+    if (req.query.category) {
+      const categoryRegex = new RegExp(req.query.category, "i");
+      const categoryFilter = {
+        $or: [{ catogery: categoryRegex }, { name: categoryRegex }],
+      };
+
+      if (queryObj.$or) {
+        queryObj.$and = [{ $or: queryObj.$or }, categoryFilter];
+        delete queryObj.$or;
+      } else {
+        queryObj.$or = categoryFilter.$or;
+      }
+    }
+
     let sortOption = {};
     if (req.query.sort === "lowToHigh") sortOption = { price: 1 };
     if (req.query.sort === "highToLow") sortOption = { price: -1 };
-    const products = await Product.find({ ...keyword, ...brand }).sort(sortOption);
+
+    const products = await Product.find(queryObj).sort(sortOption);
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -87,7 +112,7 @@ const deleteProduct = async (req, res) => {
 
 const createProductReview = async (req, res) => {
   try {
-    const { rating, comment } = req.body;
+    const { rating, comment, images } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -98,15 +123,25 @@ const createProductReview = async (req, res) => {
       (r) => r.user.toString() === req.user._id.toString()
     );
 
+    const reviewImages = Array.isArray(images)
+      ? images
+      : images
+      ? [images]
+      : [];
+
     if (alreadyReviewed) {
       alreadyReviewed.rating = Number(rating);
       alreadyReviewed.comment = comment;
+      if (reviewImages.length > 0) {
+        alreadyReviewed.images = reviewImages;
+      }
     } else {
       const review = {
         name: req.user.name,
         rating: Number(rating),
         comment,
         user: req.user._id,
+        images: reviewImages,
       };
       product.reviews.push(review);
     }

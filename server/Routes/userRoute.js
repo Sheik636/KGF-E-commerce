@@ -8,6 +8,8 @@ const {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  getAddresses,
+  saveAddress,
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -23,5 +25,8 @@ router.post("/login", loginUser);
 router.get("/wishlist", protect, getWishlist);
 router.post("/wishlist/add", protect, addToWishlist);
 router.delete("/wishlist/remove/:productId", protect, removeFromWishlist);
+
+router.get("/addresses", protect, getAddresses);
+router.post("/addresses", protect, saveAddress);
 
 module.exports = router;

@@ -5,14 +5,42 @@ import ProductCard from "../Components/ProductCard";
 import SearchSideBar from "../Components/SearchSideBar";
 import { FireSkeletonGrid } from "../Components/FireLoader";
 import { SearchContext } from "../context/SearchContext";
-import { ArrowDown, PackageSearch } from "lucide-react";
+import {
+  ArrowDown,
+  PackageSearch,
+  ShieldCheck,
+  Award,
+  HeartHandshake,
+  Truck,
+  Sparkles,
+  Star,
+  CheckCircle2,
+} from "lucide-react";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { isOpen, setIsOpen, keyword, setKeyword, brand, setBrand, sort, setSort } =
-    useContext(SearchContext);
+  const {
+    setIsOpen,
+    keyword,
+    setKeyword,
+    brand,
+    setBrand,
+    category,
+    setCategory,
+    sort,
+    setSort,
+  } = useContext(SearchContext);
+
+  const CATEGORY_TABS = [
+    { label: "All Items", value: "" },
+    { label: "👕 T-Shirts", value: "T-Shirt" },
+    { label: "👖 Trackpants", value: "Trackpant" },
+    { label: "🧥 Hoodies", value: "Hoodie" },
+    { label: "🧥 Jackets", value: "Jacket" },
+    { label: "👟 Footwear", value: "Shoes" },
+  ];
 
   useEffect(() => {
     document.title = "KGF Store — Wear The Power";
@@ -23,7 +51,7 @@ const Home = () => {
       try {
         setLoading(true);
         const { data } = await API.get(
-          `/products?keyword=${keyword}&brand=${brand}&sort=${sort}`
+          `/products?keyword=${keyword}&brand=${brand}&category=${category}&sort=${sort}`
         );
         setProducts(data);
       } catch {
@@ -33,7 +61,7 @@ const Home = () => {
       }
     };
     fetchProducts();
-  }, [keyword, brand, sort]);
+  }, [keyword, brand, category, sort]);
 
   // Extract unique brands for the filter sidebar
   const availableBrands = useMemo(() => {
@@ -80,12 +108,6 @@ const Home = () => {
             >
               Explore Collection <ArrowDown size={18} />
             </button>
-            <button
-              onClick={() => setIsOpen(true)}
-              className="btn-outline px-6 py-3 text-base"
-            >
-              Filter Products
-            </button>
           </div>
         </div>
 
@@ -94,7 +116,7 @@ const Home = () => {
 
       {/* Products Section */}
       <section id="products" className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex items-end justify-between mb-10 animate-fade-in-up">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 animate-fade-in-up">
           <div>
             <h2 className="font-display text-4xl text-white tracking-wide">
               CATALOG
@@ -104,6 +126,26 @@ const Home = () => {
           <span className="text-brand-muted text-sm font-medium">
             Showing {products.length} product{products.length !== 1 ? "s" : ""}
           </span>
+        </div>
+
+        {/* ── Category Filter Pills ── */}
+        <div className="flex flex-wrap items-center gap-2.5 mb-10 pb-2 border-b border-brand-border/50 animate-fade-in-up">
+          {CATEGORY_TABS.map((tab) => {
+            const isActive = category === tab.value;
+            return (
+              <button
+                key={tab.value}
+                onClick={() => setCategory(tab.value)}
+                className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                  isActive
+                    ? "bg-brand-red text-white shadow-[0_0_15px_rgba(229,9,20,0.5)] scale-105"
+                    : "bg-brand-dark border border-brand-border text-brand-muted hover:text-white hover:border-brand-red/50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         {loading ? (
@@ -121,6 +163,7 @@ const Home = () => {
               onClick={() => {
                 setKeyword("");
                 setBrand("");
+                setCategory("");
                 setSort("");
               }}
               className="btn-outline px-6 py-2.5 text-sm inline-block"
@@ -143,6 +186,103 @@ const Home = () => {
             ))}
           </div>
         )}
+      </section>
+
+      {/* ── ABOUT US SECTION ── */}
+      <section id="about" className="relative py-20 bg-brand-dark/60 border-t border-brand-border overflow-hidden">
+        <div className="fire-hero-glow" />
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up">
+            <p className="text-brand-red uppercase tracking-[0.3em] text-xs font-bold mb-3 flex items-center justify-center gap-2">
+              <Sparkles size={14} /> Our Legacy & Craft
+            </p>
+            <h2 className="font-display text-5xl md:text-6xl text-white tracking-wide">
+              BUILT FOR <span className="fire-text">POWER</span>. ENGINEERED FOR QUALITY.
+            </h2>
+            <div className="w-20 h-1 bg-brand-red mx-auto mt-4 mb-6 rounded-full" />
+            <p className="text-brand-muted text-base leading-relaxed">
+              At KGF Store, we don't just sell apparel — we craft high-octane streetwear built to empower individuals who stand out with boldness. Every thread, seam, and detail reflects our passion for unyielding quality and authentic customer relationships.
+            </p>
+          </div>
+
+          {/* 4 Quality & Value Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div className="card-dark p-6 border-brand-border hover:border-brand-red/50 transition-all duration-300 group hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all">
+                <Award size={24} />
+              </div>
+              <h3 className="font-display text-2xl text-white mb-2 tracking-wide">
+                240+ GSM Fabric
+              </h3>
+              <p className="text-brand-muted text-xs leading-relaxed">
+                Ultra-heavyweight 100% combed organic cotton engineered for superior comfort, durability, and pre-shrunk shape retention.
+              </p>
+            </div>
+
+            <div className="card-dark p-6 border-brand-border hover:border-brand-red/50 transition-all duration-300 group hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all">
+                <ShieldCheck size={24} />
+              </div>
+              <h3 className="font-display text-2xl text-white mb-2 tracking-wide">
+                Non-Fade Prints
+              </h3>
+              <p className="text-brand-muted text-xs leading-relaxed">
+                High-density screen printing & puff embroidery designed to withstand 100+ washes without cracking or losing vibrancy.
+              </p>
+            </div>
+
+            <div className="card-dark p-6 border-brand-border hover:border-brand-red/50 transition-all duration-300 group hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all">
+                <HeartHandshake size={24} />
+              </div>
+              <h3 className="font-display text-2xl text-white mb-2 tracking-wide">
+                Customer First
+              </h3>
+              <p className="text-brand-muted text-xs leading-relaxed">
+                Dedicated 24/7 customer support, instant replacement policies, and real-time order tracking at every stage of delivery.
+              </p>
+            </div>
+
+            <div className="card-dark p-6 border-brand-border hover:border-brand-red/50 transition-all duration-300 group hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all">
+                <Truck size={24} />
+              </div>
+              <h3 className="font-display text-2xl text-white mb-2 tracking-wide">
+                Express Dispatch
+              </h3>
+              <p className="text-brand-muted text-xs leading-relaxed">
+                Orders packaged with tamper-proof security seals and dispatched within 24 hours with premium courier tracking.
+              </p>
+            </div>
+          </div>
+
+          {/* Trust & Guarantee Banner */}
+          <div className="card-dark p-8 border-brand-red/30 bg-gradient-to-r from-brand-card via-brand-dark to-brand-card flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="w-14 h-14 rounded-full bg-brand-red/20 text-brand-red flex items-center justify-center shrink-0 mx-auto md:mx-0">
+                <Star size={28} className="fill-brand-red" />
+              </div>
+              <div>
+                <h4 className="font-display text-2xl text-white tracking-wide">
+                  100% SATISFACTION GUARANTEED
+                </h4>
+                <p className="text-brand-muted text-xs mt-1">
+                  Over 50,000+ satisfied customers nationwide with an average 4.9★ rating.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 text-xs text-brand-muted font-medium border-t md:border-t-0 md:border-l border-brand-border pt-4 md:pt-0 md:pl-6">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-green-400" /> Easy 7-Day Exchange
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-green-400" /> Secure Payments
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
     </>
   );

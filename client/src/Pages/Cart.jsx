@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import {

@@ -3,10 +3,29 @@ import { SearchContext } from "../context/SearchContext";
 import { Filter, X, RotateCcw } from "lucide-react";
 
 const SearchSideBar = ({ brands = [] }) => {
-  const { isOpen, setIsOpen, keyword, setKeyword, brand, setBrand, sort, setSort } =
-    useContext(SearchContext);
+  const {
+    isOpen,
+    setIsOpen,
+    keyword,
+    setKeyword,
+    brand,
+    setBrand,
+    category,
+    setCategory,
+    sort,
+    setSort,
+  } = useContext(SearchContext);
 
-  const activeFilterCount = [keyword, brand, sort].filter(Boolean).length;
+  const CATEGORIES = [
+    { label: "All Products", value: "" },
+    { label: "T-Shirt", value: "T-Shirt" },
+    { label: "Trackpant", value: "Trackpant" },
+    { label: "Hoodies", value: "Hoodie" },
+    { label: "Jackets", value: "Jacket" },
+    { label: "Footwear / Shoes", value: "Shoes" },
+  ];
+
+  const activeFilterCount = [keyword, brand, category, sort].filter(Boolean).length;
 
   return (
     <>
@@ -52,9 +71,27 @@ const SearchSideBar = ({ brands = [] }) => {
                 type="text"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="Search products..."
+                placeholder="Search products, t-shirts..."
                 className="input-dark"
               />
+            </div>
+
+            {/* Product Category Filter */}
+            <div className="animate-fade-in-up delay-150">
+              <label className="block text-sm text-brand-muted uppercase tracking-widest mb-2 font-medium">
+                Product Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="input-dark"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="animate-fade-in-up delay-200">
@@ -97,6 +134,7 @@ const SearchSideBar = ({ brands = [] }) => {
             onClick={() => {
               setKeyword("");
               setBrand("");
+              setCategory("");
               setSort("");
             }}
             className="btn-outline w-full py-3 flex items-center justify-center gap-2 animate-fade-in"

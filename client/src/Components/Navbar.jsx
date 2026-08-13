@@ -62,6 +62,19 @@ const Navbar = () => {
             Home
           </Link>
 
+          <a
+            href="/#about"
+            onClick={(e) => {
+              if (window.location.pathname === "/") {
+                e.preventDefault();
+                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            className="nav-link text-sm"
+          >
+            About
+          </a>
+
           {token && (
             <Link to="/myorders" className="nav-link text-sm">
               Orders

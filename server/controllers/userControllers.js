@@ -106,10 +106,46 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+const getAddresses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    res.json(user ? user.addresses || [] : []);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const saveAddress = async (req, res) => {
+  try {
+    const { name, address, city, postalCode, country } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const exists = user.addresses?.some(
+      (addr) =>
+        addr.address?.toLowerCase() === address?.toLowerCase() &&
+        addr.postalCode === postalCode
+    );
+
+    if (!exists) {
+      user.addresses.push({ name, address, city, postalCode, country });
+      await user.save();
+    }
+
+    res.json(user.addresses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  getAddresses,
+  saveAddress,
 };

@@ -5,10 +5,11 @@ export const SearchContext = createContext();
 const SearchProvider = ({children})=>{
     const [keyword, setKeyword] = useState('');
     const [brand, setBrand] = useState("");
+    const [category, setCategory] = useState("");
     const [sort, setSort] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     return(
-        <SearchContext.Provider value={{ isOpen, setIsOpen, keyword, setKeyword, brand, setBrand, sort, setSort}}>{children}</SearchContext.Provider>
+        <SearchContext.Provider value={{ isOpen, setIsOpen, keyword, setKeyword, brand, setBrand, category, setCategory, sort, setSort}}>{children}</SearchContext.Provider>
     );
 }
 

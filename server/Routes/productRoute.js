@@ -22,6 +22,13 @@ router.post("/upload", adminProtect, upload.single("image"), (req, res) => {
   res.json({ images: req.file.path });
 });
 
+router.post("/upload-review-image", protect, upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No image file provided" });
+  }
+  res.json({ image: req.file.path });
+});
+
 router.get("/:id", getProductById);
 router.post("/:id/reviews", protect, createProductReview);
 router.delete("/:id/reviews/:reviewId", protect, deleteProductReview);

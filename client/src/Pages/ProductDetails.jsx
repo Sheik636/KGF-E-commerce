@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Heart, Minus, Plus, ShoppingCart, Zap, Package, Shield, Truck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Minus, Plus, ShoppingCart, Zap, Package, Shield, Truck, ChevronLeft, ChevronRight, Star, Upload, X } from "lucide-react";
 import API from "../Services/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -185,7 +185,7 @@ const ProductDetails = () => {
                 inStock ? "bg-green-400 animate-pulse" : "bg-red-400"
               }`}
             />
-            {inStock ? `In Stock (${product.stock} left)` : "Out Of Stock"}
+            {inStock ? `In Stock` : "Out Of Stock"}
           </p>
 
           {/* Description */}
@@ -381,6 +381,24 @@ const ProductDetails = () => {
                   </div>
                 </div>
                 <p className="text-[#ccc] text-sm mt-3">{rev.comment}</p>
+
+                {/* Attached Review Images */}
+                {rev.images && rev.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-brand-border/40">
+                    {rev.images.map((imgUrl, imgIdx) => (
+                      <img
+                        key={imgIdx}
+                        src={imgUrl}
+                        alt={`Review photo ${imgIdx + 1}`}
+                        onClick={() => {
+                          setSelectedImage(imgUrl);
+                          setLightbox(true);
+                        }}
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-brand-border hover:border-brand-red cursor-pointer transition-all hover:scale-105"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -450,12 +468,48 @@ const ProductDetails = () => {
   );
 };
 
-// Inline helper component for submitting reviews
+// Inline helper component for submitting reviews with image attachment
 const ReviewForm = ({ productId, onReviewAdded }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [images, setImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Login required to upload review photos");
+      return navigate("/login");
+    }
+
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const { data } = await API.post("/products/upload-review-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (data.image) {
+        setImages((prev) => [...prev, data.image]);
+        toast.success("Photo attached!");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to upload photo");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (indexToRemove) => {
+    setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -469,10 +523,11 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
     }
     try {
       setSubmitting(true);
-      await API.post(`/products/${productId}/reviews`, { rating, comment });
-      toast.success("Review submitted!");
+      await API.post(`/products/${productId}/reviews`, { rating, comment, images });
+      toast.success("Review submitted with photo!");
       setComment("");
       setRating(5);
+      setImages([]);
       if (onReviewAdded) onReviewAdded();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to submit review");
@@ -484,7 +539,7 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2">
+        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2 font-medium">
           Your Rating
         </label>
         <div className="flex gap-2">
@@ -509,7 +564,7 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
       </div>
 
       <div>
-        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2">
+        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2 font-medium">
           Your Review Comment
         </label>
         <textarea
@@ -521,9 +576,56 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
         />
       </div>
 
+      {/* ── Photo Attachment Upload Button ── */}
+      <div>
+        <label className="block text-brand-muted text-xs uppercase tracking-wider mb-2 font-medium">
+          Attach Photos (Optional)
+        </label>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="btn-outline px-4 py-2 text-xs font-semibold flex items-center gap-2 cursor-pointer border-brand-border hover:border-brand-red transition-all">
+            <Upload size={15} className="text-brand-red" />
+            <span>{uploading ? "Uploading Photo..." : "Upload Photo"}</span>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
+          <span className="text-xs text-brand-muted">
+            PNG, JPG, WEBP up to 5MB
+          </span>
+        </div>
+
+        {/* Uploaded Thumbnails Preview */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-3">
+            {images.map((img, idx) => (
+              <div key={idx} className="relative group">
+                <img
+                  src={img}
+                  alt={`Upload preview ${idx + 1}`}
+                  className="w-16 h-16 object-cover rounded-lg border border-brand-border"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(idx)}
+                  className="absolute -top-2 -right-2 bg-brand-red text-white rounded-full p-0.5 shadow hover:scale-110 transition-transform"
+                  title="Remove image"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || uploading}
         className="btn-primary py-2.5 px-6 text-sm flex items-center gap-2"
       >
         {submitting ? "Submitting..." : "Submit Review"}

@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import API from "../Services/api";
 import FireLoader from "../Components/FireLoader";
 import { Link } from "react-router-dom";
-import { Package, CreditCard, CheckCircle2, Clock } from "lucide-react";
+import { Package, CreditCard, CheckCircle2, Clock,X } from "lucide-react";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -179,23 +179,24 @@ const MyOrders = () => {
               </div>
 
               {/* ── Order Status Stepper Timeline ── */}
-              <div className="mb-8 p-5 bg-brand-dark rounded-xl border border-brand-border">
-                <h3 className="text-xs text-brand-muted uppercase tracking-widest mb-4">
+              <div className="mb-8 p-6 bg-brand-dark rounded-xl border border-brand-border">
+                <h3 className="text-xs text-brand-muted uppercase tracking-widest mb-6 font-semibold">
                   Order Tracking Timeline
                 </h3>
 
                 {isCancelled ? (
                   <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-semibold flex items-center gap-2">
-                    <Clock size={16} /> Order Cancelled
+                    <X size={16} /> Order Cancelled
                   </div>
                 ) : (
-                  <div className="relative flex items-center justify-between">
-                    {/* Connecting Progress Bar Line */}
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-brand-border z-0" />
+                  <div className="relative flex items-start justify-between">
+                    {/* Connecting Progress Bar Background Line (centered vertically with the 36px circles at top-[18px]) */}
+                    <div className="absolute left-[36px] right-[36px] top-[18px] -translate-y-1/2 h-1 bg-brand-border z-0" />
+                    {/* Active Progress Bar Line */}
                     <div
-                      className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-red transition-all duration-500 z-0"
+                      className="absolute left-[36px] top-[18px] -translate-y-1/2 h-1 bg-brand-red transition-all duration-500 z-0"
                       style={{
-                        width: `${(currentStep / (steps.length - 1)) * 100}%`,
+                        width: `calc(${currentStep / (steps.length - 1)} * (100% - 72px))`,
                       }}
                     />
 
@@ -206,7 +207,7 @@ const MyOrders = () => {
                       return (
                         <div
                           key={stepLabel}
-                          className="relative z-10 flex flex-col items-center gap-2"
+                          className="relative z-10 flex flex-col items-center gap-2 text-center w-20 sm:w-24"
                         >
                           <div
                             className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
@@ -218,8 +219,12 @@ const MyOrders = () => {
                             {isDone ? <CheckCircle2 size={16} /> : idx + 1}
                           </div>
                           <span
-                            className={`text-xs font-medium ${
-                              isDone ? "text-white" : "text-brand-muted"
+                            className={`text-xs font-semibold tracking-wide ${
+                              isCurrent
+                                ? "text-brand-red font-bold"
+                                : isDone
+                                ? "text-white"
+                                : "text-brand-muted"
                             }`}
                           >
                             {stepLabel}
@@ -232,7 +237,7 @@ const MyOrders = () => {
 
                 {/* Carrier & Tracking Info */}
                 {order.trackingNumber && (
-                  <div className="mt-4 pt-3 border-t border-brand-border/50 text-xs text-brand-muted flex items-center justify-between">
+                  <div className="mt-6 pt-3 border-t border-brand-border/50 text-xs text-brand-muted flex flex-wrap items-center justify-between gap-2">
                     <span>
                       Carrier: <strong className="text-white">{order.carrier || "Standard Express"}</strong>
                     </span>
@@ -272,10 +277,10 @@ const MyOrders = () => {
               </div>
 
               {/* Order Status & Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-brand-border/50">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
                       order.isPaid
                         ? "bg-green-500/15 text-green-400 border border-green-500/30"
                         : "bg-brand-red/15 text-brand-red border border-brand-red/30"
@@ -298,7 +303,7 @@ const MyOrders = () => {
                     !isCancelled && (
                       <button
                         onClick={() => handleCancelOrder(order._id)}
-                        className="px-4 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 text-xs font-semibold transition-colors"
+                        className="px-5 py-2.5 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500 text-xs font-semibold transition-all"
                       >
                         Cancel Order
                       </button>
@@ -307,7 +312,7 @@ const MyOrders = () => {
                   {!order.isPaid && !isCancelled && (
                     <button
                       onClick={() => payment(order)}
-                      className="btn-primary px-6 py-2 text-sm flex items-center gap-2"
+                      className="btn-primary px-6 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2"
                     >
                       <CreditCard size={16} /> Pay Now
                     </button>
