@@ -17,7 +17,7 @@ const couponSchema = new mongoose.Schema(
     },
     maxDiscountAmount: {
       type: Number,
-      default: 0, // 0 means no cap
+      default: 0, 
     },
     minPurchase: {
       type: Number,

@@ -13,6 +13,7 @@ const Home = lazy(() => import("./Pages/Home"));
 const AdminLogin = lazy(() => import("./Pages/AdminLogin"));
 const Login = lazy(() => import("./Pages/Login"));
 const Register = lazy(() => import("./Pages/RegisterUser"));
+const UserProfile = lazy(() => import("./Pages/UserProfile"));
 const Cart = lazy(() => import("./Pages/Cart"));
 const Wishlist = lazy(() => import("./Pages/Wishlist"));
 const AdminDashboard = lazy(() => import("./Pages/AdminDashboard"));
@@ -44,6 +45,8 @@ function AppContent() {
     sessionStorage.setItem("kgf_intro_seen", "1");
     setShowIntro(false);
   };
+
+  const isProfilePage = location.pathname === "/profile";
 
   return (
     <>
@@ -106,6 +109,14 @@ function AppContent() {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route
+                path="/profile"
+                element={
+                  <UserProtectedRoute>
+                    <UserProfile />
+                  </UserProtectedRoute>
+                }
+              />
+              <Route
                 path="/checkout"
                 element={
                   <UserProtectedRoute>
@@ -125,7 +136,7 @@ function AppContent() {
             </Routes>
           </Suspense>
         </main>
-        {!isAdminRoute && !showIntro && <Footer />}
+        {!isAdminRoute && !isProfilePage && !showIntro && <Footer />}
       </div>
     </>
   );

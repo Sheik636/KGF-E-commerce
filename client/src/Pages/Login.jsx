@@ -22,8 +22,14 @@ function Login() {
       localStorage.setItem("userInfo", JSON.stringify(data));
       toast.success("Welcome back!");
       navigate("/");
-    } catch {
-      toast.error("Invalid credentials");
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Invalid credentials";
+      toast.error(errorMsg);
+      if (error.response?.data?.isVerified === false) {
+        navigate("/register", {
+          state: { email, unverified: true },
+        });
+      }
     } finally {
       setLoading(false);
     }

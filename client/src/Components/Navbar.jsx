@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { SearchContext } from "../context/SearchContext";
 import { useSelector } from "react-redux";
-import { Menu, X, Search, ShoppingBag, Heart, Package, Home, LogIn, UserPlus, LogOut } from "lucide-react";
+import { Menu, X, Search, ShoppingBag, Heart, Package, Home, LogIn, UserPlus, LogOut, User } from "lucide-react";
 
 const Navbar = () => {
   const token = localStorage.getItem("token");
@@ -76,9 +76,12 @@ const Navbar = () => {
           </a>
 
           {token && (
-            <Link to="/myorders" className="nav-link text-sm">
-              Orders
-            </Link>
+            <>
+              
+              <Link to="/myorders" className="nav-link text-sm">
+                Orders
+              </Link>
+            </>
           )}
 
           <Link to="/wishlist" className="nav-link text-sm flex items-center gap-2">
@@ -117,10 +120,12 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <button onClick={logoutHandler} className="btn-outline text-sm px-4 py-2">
-              Log Out
-            </button>
+            <Link to="/profile" className="btn-primary text-sm px-4 py-2 flex items-center gap-1.5">
+              <User size={16} /> Profile
+            </Link>
           )}
+
+          
         </div>
 
         {/* Mobile: Search + Cart + Hamburger */}
@@ -162,7 +167,10 @@ const Navbar = () => {
           <MobileLink to="/" icon={Home} label="Home" onClick={closeMobile} />
 
           {token && (
-            <MobileLink to="/myorders" icon={Package} label="My Orders" onClick={closeMobile} />
+            <>
+              <MobileLink to="/profile" icon={User} label="My Profile" onClick={closeMobile} />
+              <MobileLink to="/myorders" icon={Package} label="My Orders" onClick={closeMobile} />
+            </>
           )}
 
           <MobileLink to="/wishlist" icon={Heart} label="Wishlist" badge={wishlistItems.length} onClick={closeMobile} />
